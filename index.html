@@ -3,1799 +3,521 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TypeRush — Test de vitesse</title>
+<title>Test de rapidité clavier</title>
 <style>
-*{box-sizing:border-box}
 :root{
-  --bg:#0b1020;--card:#121a2d;--card2:#18233b;--text:#eef3ff;
-  --muted:#91a0bd;--accent:#7c5cff;--accent2:#20d9a4;--danger:#ff5577;
+  --bg:#eef3ff;
+  --panel:#ffffff;
+  --panel2:#f5f7ff;
+  --text:#18223a;
+  --muted:#65708a;
+  --primary:#5967e8;
+  --primary-dark:#414fc9;
+  --accent:#8b5cf6;
+  --success:#22a06b;
+  --danger:#e05252;
+  --border:#dce2f2;
+  --shadow:0 18px 45px rgba(48,62,110,.12);
 }
+*{box-sizing:border-box}
 body{
-  margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
-  background:radial-gradient(circle at 20% 10%,#202b58 0,transparent 35%),
-             radial-gradient(circle at 90% 90%,#143d46 0,transparent 35%),var(--bg);
-  color:var(--text);display:flex;justify-content:center;padding:35px 18px;
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:var(--text);
+  background:linear-gradient(135deg,#eef3ff 0%,#f8f4ff 100%);
 }
-.app{width:min(1250px,100%)}
-body.module-mode{padding:12px 18px}
-body.module-mode > .app{width:min(1250px,100%)}
-body.module-mode > .app > header{display:none!important}
-body.module-mode .panel{min-height:calc(100vh - 24px);padding:30px;border-radius:24px}
-.learning-module-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px}
-.learning-module-bar .module-title{font-weight:900;font-size:16px;margin-right:auto}
-.learning-module-bar .module-restart{background:var(--accent2);color:#071b16}
-.module-content{max-width:1180px;margin:0 auto}
-@media(max-width:760px){body.module-mode{padding:8px}.learning-module-bar{margin-bottom:16px}.learning-module-bar .module-title{width:100%;order:-1}.learning-module-bar button{flex:1;min-width:150px}}
-header{text-align:center;margin-bottom:24px}
-.logo{font-size:14px;letter-spacing:3px;color:var(--accent2);font-weight:800}
-h1{font-size:clamp(34px,6vw,58px);margin:8px 0}
-.subtitle{color:var(--muted);margin:0}
-.panel{
-  background:rgba(18,26,45,.88);border:1px solid rgba(255,255,255,.08);
-  border-radius:24px;padding:24px;box-shadow:0 20px 70px rgba(0,0,0,.35);backdrop-filter:blur(12px)
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+header{
+  padding:22px 6%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
 }
-.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
-button,.select{
-  border:0;border-radius:12px;padding:12px 16px;background:var(--card2);color:var(--text);
-  cursor:pointer;font-weight:700;transition:.2s
+.logo{
+  font-weight:900;
+  font-size:1.35rem;
+  color:var(--primary-dark);
 }
-button:hover{transform:translateY(-2px);background:#253252}
-button.active{background:var(--accent)}
-#newGame{margin-left:auto;background:var(--accent2);color:#071b16}
-#homeResult{margin-left:0;background:var(--card2);color:var(--text)}
-.game-home{background:var(--card2);color:var(--text)}
-.game-home:hover{background:#253252}
-.result-actions{display:grid;grid-template-columns:minmax(220px,1fr) minmax(180px,.8fr);gap:14px;max-width:560px;margin:24px auto 0}.result-actions button{margin:0;min-height:62px;border-radius:16px;font-size:16px;font-weight:900;letter-spacing:.2px;transition:transform 160ms ease,box-shadow 160ms ease,background-color 160ms ease,border-color 160ms ease}.result-actions .action-replay{background:var(--accent);color:#fff;border:1px solid var(--accent);box-shadow:0 10px 28px rgba(0,0,0,.25)}.result-actions .action-home{background:rgba(255,255,255,.045);color:var(--text);border:1px solid rgba(255,255,255,.12)}.result-actions .action-icon{font-size:22px;vertical-align:-2px;margin-right:7px}.result-actions button:hover{transform:translateY(-2px)}.result-actions .action-replay:hover{filter:brightness(1.08);box-shadow:0 14px 34px rgba(0,0,0,.3)}.result-actions .action-home:hover{background:var(--card2);border-color:var(--accent);box-shadow:0 8px 22px rgba(0,0,0,.18)}.result-actions button:active{transform:scale(.97);transition-duration:50ms}.result-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:4px}@media(max-width:650px){.result-actions{grid-template-columns:1fr;max-width:100%;gap:10px}.result-actions button{min-height:58px}}
-
-#homeResult:hover{background:#253252}
-.timer-control{display:flex;align-items:center;gap:8px;background:var(--card2);padding:7px 10px 7px 13px;border-radius:12px;font-weight:700}
-.timer-control span{font-size:13px}
-.timer-control select,.timer-control input{border:0;border-radius:8px;background:#0d1527;color:var(--text);padding:8px 9px;outline:none;font-weight:700}
-.timer-control input{width:75px}
-.timer-control select:focus,.timer-control input:focus{box-shadow:0 0 0 2px var(--accent)}
-.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:20px}
-.stat{background:rgba(255,255,255,.04);border-radius:16px;padding:14px;text-align:center}
-.stat strong{display:block;font-size:27px;margin-top:4px}
-.stat span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}
-.textbox{
-  min-height:190px;padding:24px;background:#0d1527;border-radius:18px;
-  font-size:23px;line-height:1.8;letter-spacing:.3px;user-select:none
+.badge{
+  background:#fff;
+  border:1px solid var(--border);
+  padding:9px 14px;
+  border-radius:999px;
+  color:var(--muted);
+  font-size:.9rem;
 }
-/* Phase 3 : combo et effets de gameplay */
-.combo-bar{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 0;min-height:52px}
-.combo-badge{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(32,217,164,.12));border:1px solid rgba(124,92,255,.35);font-weight:900;letter-spacing:.3px}
-.combo-badge .combo-number{font-size:25px;color:var(--accent)}
-.combo-badge.hot{box-shadow:0 0 24px rgba(124,92,255,.35);transform:scale(1.04)}
-.combo-badge.fire{background:linear-gradient(135deg,rgba(255,95,31,.18),rgba(255,205,50,.12));border-color:rgba(255,160,50,.5)}
-.combo-badge.fire .combo-number{color:#ffb52e}
-.combo-best{color:var(--muted);font-size:12px;font-weight:800;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06)}
-.combo-message{min-height:22px;color:var(--muted);font-weight:700;font-size:13px}
-#game.combo-hit .textbox{box-shadow:0 0 0 2px rgba(32,217,164,.14),0 0 28px rgba(32,217,164,.08)}
-#game.combo-hot .textbox{box-shadow:0 0 0 2px rgba(255,181,46,.18),0 0 34px rgba(255,181,46,.12)}
-#game.combo-break .textbox{animation:comboBreak .22s ease}
-.combo-pop{animation:comboPop .25s ease}
-@keyframes comboPop{50%{transform:scale(1.1)}}
-@keyframes comboBreak{25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
-body.no-animations .combo-badge,body.no-animations #game.combo-break .textbox,body.no-animations .combo-pop{animation:none!important;transition:none!important}
-
-/* Effets uniques de chaque palier de combo */
-.combo-milestone{
-  position:fixed;inset:0;z-index:50;pointer-events:none;display:grid;place-items:center;
-  opacity:0;visibility:hidden;
+main{width:min(1100px,92%);margin:0 auto 50px}
+.screen{display:none}
+.screen.active{display:block}
+.hero{
+  min-height:480px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:50px 20px;
 }
-.combo-milestone.show{visibility:visible}
-.combo-milestone__content{
-  padding:18px 28px;border-radius:22px;background:rgba(10,15,30,.82);
-  border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(12px);
-  text-align:center;font-weight:1000;letter-spacing:1px;transform:scale(.65);
-  box-shadow:0 18px 60px rgba(0,0,0,.35)
+.hero-card{
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(220,226,242,.9);
+  box-shadow:var(--shadow);
+  border-radius:30px;
+  padding:55px;
+  max-width:850px;
 }
-.combo-milestone__icon{display:block;font-size:46px;line-height:1;margin-bottom:5px}
-.combo-milestone__text{font-size:clamp(24px,5vw,42px);line-height:1}
-.combo-milestone__sub{display:block;margin-top:7px;color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase}
-.combo-milestone.m5.show{animation:milestoneFade .75s ease}
-.combo-milestone.m5 .combo-milestone__content{animation:milestonePop .75s cubic-bezier(.2,1.4,.4,1)}
-.combo-milestone.m10.show{animation:milestoneFlash .8s ease}
-.combo-milestone.m10 .combo-milestone__content{animation:milestoneZoom .8s cubic-bezier(.15,1.5,.3,1)}
-.combo-milestone.m20.show{animation:milestonePulse .9s ease}
-.combo-milestone.m20 .combo-milestone__content{animation:milestonePulseBox .9s ease}
-.combo-milestone.m30.show{animation:milestoneShock .95s ease}
-.combo-milestone.m30 .combo-milestone__content{animation:milestoneShockBox .95s ease}
-.combo-milestone.m50.show{animation:milestoneUltimate 1.25s ease}
-.combo-milestone.m50 .combo-milestone__content{animation:milestoneUltimateBox 1.25s cubic-bezier(.15,1.7,.25,1)}
-.game.milestone-5 .textbox{animation:milestoneText5 .55s ease}
-.game.milestone-10 .textbox{animation:milestoneText10 .65s ease}
-.game.milestone-20 .textbox{animation:milestoneText20 .7s ease}
-.game.milestone-30 .textbox{animation:milestoneText30 .8s ease}
-.game.milestone-50 .textbox{animation:milestoneText50 1s ease}
-@keyframes milestoneFade{0%{opacity:0}20%,75%{opacity:1}100%{opacity:0}}
-@keyframes milestonePop{0%{transform:scale(.55) translateY(18px);opacity:0}35%{transform:scale(1.08) translateY(0);opacity:1}100%{transform:scale(1);opacity:0}}
-@keyframes milestoneFlash{0%,100%{opacity:0}12%,30%{opacity:1}45%{opacity:.15}60%{opacity:.9}80%{opacity:.25}}
-@keyframes milestoneZoom{0%{transform:scale(.35);opacity:0}30%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:0}}
-@keyframes milestonePulse{0%,100%{opacity:0}15%,75%{opacity:1}50%{opacity:.45}}
-@keyframes milestonePulseBox{0%{transform:scale(.65);opacity:0}25%{transform:scale(1.08);opacity:1}45%{transform:scale(.95)}65%{transform:scale(1.04)}100%{transform:scale(1);opacity:0}}
-@keyframes milestoneShock{0%,100%{opacity:0}12%,78%{opacity:1}45%{opacity:.7}}
-@keyframes milestoneShockBox{0%{transform:scale(.5) rotate(-2deg);opacity:0}25%{transform:scale(1.15) rotate(2deg);opacity:1}38%{transform:translateX(-8px) scale(1.02)}48%{transform:translateX(8px) scale(1.02)}58%{transform:translateX(-4px) scale(1)}100%{transform:scale(1);opacity:0}}
-@keyframes milestoneUltimate{0%,100%{opacity:0}10%,82%{opacity:1}50%{opacity:.65}}
-@keyframes milestoneUltimateBox{0%{transform:scale(.3) rotate(-6deg);opacity:0;filter:brightness(1)}22%{transform:scale(1.2) rotate(3deg);opacity:1;filter:brightness(1.8)}45%{transform:scale(.96) rotate(-1deg);filter:brightness(1.2)}65%{transform:scale(1.08) rotate(0);filter:brightness(1.6)}100%{transform:scale(1);opacity:0;filter:brightness(1)}}
-@keyframes milestoneText5{50%{transform:scale(1.025)}}
-@keyframes milestoneText10{25%,75%{transform:translateY(-2px)}}
-@keyframes milestoneText20{25%{transform:scale(1.02)}50%{transform:scale(1)}}
-@keyframes milestoneText30{20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
-@keyframes milestoneText50{20%{transform:scale(1.025)}45%{transform:scale(.99)}70%{transform:scale(1.02)}}
-body.no-animations .combo-milestone{display:none!important}
-.char.correct{color:var(--accent2)}
-.char.wrong{color:var(--danger);text-decoration:underline}
-.char.current{border-left:2px solid var(--accent);animation:blink .8s infinite}
-@keyframes blink{50%{border-color:transparent}}
-#input{
-  width:100%;margin-top:14px;min-height:105px;resize:none;border:1px solid #2b3856;
-  background:#0a1120;color:var(--text);border-radius:16px;padding:17px;font-size:18px;outline:none
+h1{font-size:clamp(2.2rem,6vw,4.6rem);margin:0 0 16px;line-height:1}
+h2{font-size:2rem;margin:0 0 12px}
+h3{margin:0 0 8px}
+p{line-height:1.6}
+.subtitle{font-size:1.15rem;color:var(--muted);max-width:680px;margin:0 auto 30px}
+.actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn{
+  border:0;border-radius:14px;padding:13px 21px;font-weight:800;
+  transition:.18s transform,.18s background;
 }
-#input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.15)}
-.progress{height:7px;background:#222d46;border-radius:99px;overflow:hidden;margin-top:16px}
-#bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.1s}
-.result{display:none;text-align:center;padding:30px 10px 20px}
-.result.show{display:block}
-.result-header{margin-bottom:24px}.result-title{font-size:clamp(25px,5vw,36px);font-weight:900;margin:0 0 8px}.result-subtitle{color:var(--muted);margin:0}
-.result-main{background:linear-gradient(135deg,rgba(124,92,255,.14),rgba(32,217,164,.06));border:1px solid rgba(124,92,255,.28);border-radius:22px;padding:24px 18px;margin-bottom:18px}
-.result-main .big{font-size:clamp(68px,12vw,100px);font-weight:950;line-height:.95;letter-spacing:-3px;color:var(--accent)}
-.result-main .wpm-label{margin-top:8px;color:var(--muted);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:2px}.result-main .score-line{margin-top:14px;color:var(--muted);font-size:13px}.result-main .score-line strong{color:var(--text);font-size:16px}
-.result-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 20px}.resultBox{background:rgba(255,255,255,.045);padding:18px 10px;border-radius:16px;border:1px solid rgba(255,255,255,.07);min-width:0}.resultBox b{font-size:25px;display:block;margin-bottom:6px;white-space:nowrap}.resultBox span{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px;font-weight:800}.result-combo{border-color:rgba(255,181,46,.35);background:linear-gradient(135deg,rgba(255,181,46,.12),rgba(255,255,255,.04))}.result-combo b{color:#ffb52e}.result-accuracy b{color:var(--accent2)}.result-errors b{color:var(--danger)}.result-time b{color:var(--text)}.record-message{min-height:24px;margin:4px 0 18px;font-weight:800}.record-message.new-record{color:#ffb52e}.record-message.old-record{color:var(--muted)}
-.help{color:var(--muted);text-align:center;font-size:13px;margin-top:16px}
-@media(max-width:900px){
- .stats{grid-template-columns:repeat(3,1fr)}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border)}
+.btn-danger{background:#fff0f0;color:#a52d2d;border:1px solid #f2caca}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:22px;
+  padding:24px;box-shadow:var(--shadow)
 }
-@media(max-width:650px){
- .stats,.grid{grid-template-columns:repeat(2,1fr)}
- .textbox{font-size:19px}
- .timer-control{width:100%;justify-content:space-between}
- #newGame{margin-left:0}
+.card p{color:var(--muted)}
+.level-card{position:relative}
+.level-number{
+  width:44px;height:44px;border-radius:13px;display:grid;place-items:center;
+  background:#eceeff;color:var(--primary-dark);font-weight:900;margin-bottom:16px
 }
-@media(max-width:650px){
- .stats,.grid,.history-summary{grid-template-columns:repeat(2,1fr)}
- .textbox{font-size:19px}
- .timer-control{width:100%;justify-content:space-between}
- #newGame{margin-left:0}
- .history-item{grid-template-columns:1fr}
- .history-actions{flex-direction:column}
- .result-grid{grid-template-columns:repeat(2,1fr)}
- .result-grid .resultBox:last-child{grid-column:1/-1}
+.level-card.locked{opacity:.6}
+.level-card.best{border-color:#a9b1ff}
+.level-meta{font-size:.9rem;color:var(--muted);margin:14px 0}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:30px 0 20px}
+.progress{
+  height:10px;background:#e5e9f5;border-radius:99px;overflow:hidden;margin:14px 0 24px
 }
-
-
-/* Accueil TypeRush */
-.home-screen{display:none;text-align:center;padding:10px 4px 6px}
-.home-screen.show{display:block}
-.home-hero{padding:12px 8px 8px}
-.home-kicker{color:var(--accent2);font-size:13px;font-weight:900;letter-spacing:3px;text-transform:uppercase}
-.home-title{font-size:clamp(42px,8vw,72px);line-height:1;margin:10px 0 8px;font-weight:950;letter-spacing:-2px}
-.home-subtitle{margin:0 auto;color:var(--muted);max-width:620px;font-size:15px}
-.home-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;max-width:1100px;margin:28px auto 22px}
-.home-btn{position:relative;min-height:100px;padding:18px 20px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:var(--card);color:var(--text);font:inherit;font-weight:800;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:10px;flex-direction:column;transition:transform 150ms ease,background-color 150ms ease,border-color 150ms ease,box-shadow 150ms ease,opacity 150ms ease}
-.home-btn__icon{font-size:30px;line-height:1}
-.home-btn__text{font-size:16px}
-.home-btn--primary{grid-column:1/-1;min-height:78px;background:var(--accent);color:#fff;border-color:var(--accent);font-size:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)}
-.home-btn--primary .home-btn__icon{font-size:27px}
-@media (hover:hover) and (pointer:fine){
- .home-btn:not(:disabled):hover{transform:translateY(-2px);background:var(--card2);border-color:var(--accent);box-shadow:0 8px 22px rgba(0,0,0,.18)}
- .home-btn--primary:not(:disabled):hover{background:var(--accent);filter:brightness(1.08);box-shadow:0 12px 32px rgba(0,0,0,.28)}
+.progress > div{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));width:0}
+.exercise{
+  background:var(--panel);border:1px solid var(--border);border-radius:26px;
+  padding:30px;box-shadow:var(--shadow)
 }
-.home-btn:not(:disabled):active{transform:scale(.97);transition-duration:50ms}
-.home-btn:focus{outline:none}
-.home-btn:focus-visible{outline:3px solid var(--accent);outline-offset:4px;box-shadow:0 0 0 6px rgba(124,92,255,.22)}
-.home-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;pointer-events:none}
-.home-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:760px;margin:0 auto}
-.home-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:14px 10px}
-.home-stat .icon{font-size:19px}.home-stat .value{font-size:24px;font-weight:950;margin-top:5px}.home-stat .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:3px}
-.home-stat-note{color:var(--muted);font-size:11px;margin:14px 0 0}
-body.no-animations .home-btn,body.no-animations .home-btn:hover{transition:none!important;transform:none!important}
-@media(max-width:650px){
- .home-screen{padding-top:2px}
- .home-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:22px}
- .home-btn{min-height:92px;padding:14px 10px}.home-btn__icon{font-size:27px}.home-btn__text{font-size:14px}
- .home-btn--primary{grid-column:1/-1;min-height:64px;flex-direction:row;font-size:17px}
- .home-summary{grid-template-columns:repeat(2,1fr);gap:9px}
- .home-stat{padding:12px 8px}.home-stat .value{font-size:22px}
+.instruction{
+  background:#f4f5ff;border:1px solid #e0e4ff;border-radius:16px;padding:15px 18px;
+  margin:20px 0;color:#4d5874
 }
-@media(max-width:379px){.home-actions{grid-template-columns:1fr}.home-btn--primary{grid-column:auto}.home-btn{min-height:60px;flex-direction:row}.home-btn__icon{font-size:23px}.home-summary{grid-template-columns:1fr 1fr}}
-
-/* Phase 1 : statistiques et historique */
-#statistics{display:none}
-#statistics.show{display:block}
-.stats-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-.stats-header h2{margin:0;font-size:26px}
-.stats-header p{margin:4px 0 0;color:var(--muted);font-size:13px}
-.stats-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:15px}
-.stat-card .icon{font-size:20px}
-.stat-card .value{font-size:28px;font-weight:900;margin-top:6px}
-.stat-card .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
-.history-panel{background:rgba(255,255,255,.03);border-radius:18px;padding:18px;margin-top:18px}
-.history-panel h3{margin:0 0 14px}
-.history-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.mini-stat{background:#0d1527;border-radius:12px;padding:12px;text-align:center}
-.mini-stat b{display:block;font-size:19px}
-.mini-stat span{font-size:11px;color:var(--muted)}
-.history-list{display:flex;flex-direction:column;gap:10px;max-height:560px;overflow:auto}
-.history-item{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr 1fr;gap:10px;align-items:center;background:#0d1527;border-radius:14px;padding:13px}
-.history-date{font-weight:800}.history-date small{display:block;color:var(--muted);font-weight:500;margin-top:3px}
-.history-value b{display:block;font-size:17px}.history-value span{font-size:10px;color:var(--muted);text-transform:uppercase}
-.difficulty-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:var(--card2);font-size:11px;font-weight:800}
-.history-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px}
-.danger-btn{background:rgba(255,85,119,.12);color:#ff8da5}.danger-btn:hover{background:rgba(255,85,119,.2)}
-.empty-history{text-align:center;color:var(--muted);padding:35px 10px}
-.chart{display:flex;align-items:flex-end;gap:7px;height:190px;padding:15px 8px 5px;background:#0d1527;border-radius:14px;overflow-x:auto}
-.chart-bar{min-width:18px;max-width:34px;flex:1;background:linear-gradient(to top,var(--accent),var(--accent2));border-radius:6px 6px 2px 2px;position:relative;min-height:3px}
-.chart-bar span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);margin-bottom:4px}
-@media(max-width:850px){.stats-cards{grid-template-columns:repeat(2,1fr)}.history-item{grid-template-columns:1.4fr 1fr 1fr}}
-
-/* Phase 2A : personnalisation */
-body.no-animations *,body.no-animations *::before,body.no-animations *::after{animation:none!important;transition:none!important}
-body.font-modern{--font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-body.font-mono{--font-family:"Courier New",Courier,monospace}
-body.font-cyber{--font-family:Orbitron,"Trebuchet MS",sans-serif}
-body.font-classic{--font-family:Georgia,"Times New Roman",serif}
-body{font-family:var(--font-family,Inter,system-ui,-apple-system,"Segoe UI",sans-serif)}
-.textbox.text-small{font-size:18px}.textbox.text-normal{font-size:23px}.textbox.text-large{font-size:29px}
-body.theme-obsidian{--bg:#080a0f;--card:#11151d;--card2:#1a202b;--text:#f1f5f9;--muted:#94a3b8;--accent:#8b5cf6;--accent2:#22c55e;--danger:#fb7185}
-body.theme-violet{--bg:#12091d;--card:#1d1030;--card2:#291544;--text:#f7edff;--muted:#b9a6ca;--accent:#c026ff;--accent2:#7c3aed;--danger:#ff5c93}
-body.theme-cyber{--bg:#06131c;--card:#0b202c;--card2:#103142;--text:#e6fbff;--muted:#83aab8;--accent:#00d9ff;--accent2:#00ff9d;--danger:#ff5577}
-body.theme-ocean{--bg:#06141c;--card:#0b2530;--card2:#123744;--text:#e8fbff;--muted:#8eb5bf;--accent:#38bdf8;--accent2:#2dd4bf;--danger:#fb7185}
-body.theme-forest{--bg:#07130d;--card:#102318;--card2:#173521;--text:#edfff2;--muted:#9ab5a1;--accent:#4ade80;--accent2:#a3e635;--danger:#fb7185}
-body.theme-inferno{--bg:#180906;--card:#2a110c;--card2:#3a1810;--text:#fff4ed;--muted:#c5a59a;--accent:#ff6b35;--accent2:#facc15;--danger:#ff4d67}
-/* Fonds directs : indépendants du thème */
-/* Fond clair et fond sombre : le fond change indépendamment du thème de l interface. */
-body.bg-dark{background:
- radial-gradient(circle at 20% 10%,rgba(124,92,255,.22) 0,transparent 35%),
- radial-gradient(circle at 80% 85%,rgba(32,217,164,.12) 0,transparent 32%),#0b1020;background-attachment:fixed}
-body.bg-light{background:
- radial-gradient(circle at 18% 8%,rgba(109,74,255,.10) 0,transparent 32%),
- radial-gradient(circle at 90% 88%,rgba(15,159,122,.08) 0,transparent 30%),#eef2f7;background-attachment:fixed}
-body.bg-light .home-title,body.bg-light .home-subtitle,body.bg-light .home-stat-note{color:#172033}
-body.bg-light .home-kicker{color:#0f7f68}
-
-/* Mode clair : surfaces claires teintees violet/bleu pour eviter les grands aplats blancs. */
-body.bg-light .panel,
-body.bg-light .profile-card,
-body.bg-light .home-stat,
-body.bg-light .home-btn:not(.home-btn--primary),
-body.bg-light .setting,
-body.bg-light .customize,
-body.bg-light .profile-editor,
-body.bg-light .training-card,
-body.bg-light .learning-card,
-body.bg-light .history-panel,
-body.bg-light .stat-card,
-body.bg-light .stat,
-body.bg-light .resultBox,
-body.bg-light .row-training-card,
-body.bg-light .profile-stat,
-body.bg-light .mini-stat,
-body.bg-light .training-key-chip,
-body.bg-light .training-key-row{
-  background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(238,241,255,.94));
-  border-color:rgba(109,74,255,.20);
-  color:#172033;
+.keyboard{margin:24px auto;max-width:900px}
+.key-row{display:flex;justify-content:center;gap:7px;margin:7px 0}
+.key{
+  min-width:42px;height:42px;padding:0 9px;border:1px solid #cfd6e8;
+  border-radius:8px;background:#fff;display:grid;place-items:center;
+  font-weight:800;color:#3f4960;box-shadow:0 2px 0 #c9d0e1
 }
-body.bg-light .home-btn:not(.home-btn--primary):hover,
-body.bg-light .learning-card:hover,
-body.bg-light .row-level:hover{
-  background:linear-gradient(135deg,rgba(247,244,255,.98),rgba(234,244,255,.98));
-  border-color:rgba(109,74,255,.42);
+.key.space{width:360px}
+.key.active{background:#dfe3ff;border-color:var(--primary);color:var(--primary-dark);transform:translateY(1px)}
+textarea{
+  width:100%;min-height:150px;resize:vertical;border:2px solid var(--border);
+  border-radius:18px;padding:20px;outline:none;background:#fbfcff;color:var(--text);
+  font-size:1.15rem;line-height:1.7
 }
-body.bg-light .home-btn--primary,
-body.bg-light .action-replay{
-  background:linear-gradient(135deg,#7057e8,#4f7cff);
-  border-color:#7057e8;
-  color:#fff;
+textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(89,103,232,.1)}
+textarea:disabled{background:#f1f3f8}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.stat{background:var(--panel2);border:1px solid var(--border);border-radius:16px;padding:15px}
+.stat span{display:block;color:var(--muted);font-size:.82rem;margin-bottom:5px}
+.stat strong{font-size:1.4rem}
+.final{
+  text-align:center;background:var(--panel);border:1px solid var(--border);
+  border-radius:26px;padding:40px;box-shadow:var(--shadow)
 }
-body.bg-light button,
-body.bg-light .select,
-body.bg-light .game-home,
-body.bg-light .module-restart,
-body.bg-light .theme-btn,
-body.bg-light .background-btn{
-  color:#24304a;
+.final-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:25px 0}
+.validation{font-size:1.2rem;font-weight:900;margin:15px}
+.validation.ok{color:var(--success)}
+.validation.no{color:var(--danger)}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);padding:25px}
+@media(max-width:800px){
+  .grid{grid-template-columns:1fr 1fr}
+  .stats,.final-grid{grid-template-columns:1fr 1fr}
+  .hero-card{padding:35px 20px}
 }
-body.bg-light .theme-btn.active,
-body.bg-light .row-level.active{
-  background:linear-gradient(135deg,rgba(112,87,232,.12),rgba(79,124,255,.10));
-  border-color:#7057e8;
+@media(max-width:550px){
+  .grid{grid-template-columns:1fr}
+  .stats,.final-grid{grid-template-columns:1fr 1fr}
+  .key{min-width:25px;height:34px;font-size:.72rem;padding:0 5px}
+  .key.space{width:190px}
+  header{padding:18px 4%}
 }
-body.bg-light .timer-control,
-body.bg-light .combo-best,
-body.bg-light .training-prompt,
-body.bg-light .textbox,
-body.bg-light #input,
-body.bg-light .chart,
-body.bg-light .row-keyboard,
-body.bg-light .row-key{
-  background:#eef2ff;
-  color:#172033;
-  border-color:rgba(79,124,255,.22);
-}
-body.bg-light .row-key.target{
-  outline-color:#7057e8;
-}
-body.bg-light .muted,
-body.bg-light .training-muted,
-body.bg-light .setting-help,
-body.bg-light .history-date small,
-body.bg-light .history-value span,
-body.bg-light .home-stat .label,
-body.bg-light .mini-stat span{
-  color:#5d687c;
-}
-/* Mode clair : texte des petits blocs en violet/bleu pour remplacer le noir. */
-body.bg-light .home-stat .value,
-body.bg-light .stat-card .value,
-body.bg-light .mini-stat b,
-body.bg-light .training-stat strong,
-body.bg-light .profile-stat strong,
-body.bg-light .profile-info strong{color:#5b4bd6}
-body.bg-light .home-stat .label,
-body.bg-light .stat-card .label,
-body.bg-light .mini-stat span,
-body.bg-light .training-stat small,
-body.bg-light .profile-stat span,
-body.bg-light .profile-info span{color:#4967b8}
-
-body.bg-light .danger-btn{
-  background:rgba(217,52,91,.10);
-  color:#a92749;
-}
-
-body{--bg-glow-1:rgba(124,92,255,.22);--bg-glow-2:rgba(32,217,164,.12)}
-body.bg-default{background:radial-gradient(circle at 20% 10%,var(--bg-glow-1) 0,transparent 35%),radial-gradient(circle at 80% 85%,var(--bg-glow-2) 0,transparent 32%),var(--bg);background-attachment:fixed}
-body.bg-aurora{background:radial-gradient(circle at 15% 15%,var(--accent) 0,transparent 27%),radial-gradient(circle at 85% 25%,var(--accent2) 0,transparent 25%),radial-gradient(circle at 50% 90%,rgba(255,255,255,.07) 0,transparent 35%),var(--bg);background-attachment:fixed}
-body.bg-grid{background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),radial-gradient(circle at 50% 0,var(--bg-glow-1),transparent 42%);background-size:32px 32px,32px 32px,auto;background-color:var(--bg);background-attachment:fixed}
-body.bg-sunset{background:radial-gradient(circle at 20% 20%,rgba(255,102,153,.2),transparent 30%),radial-gradient(circle at 80% 25%,rgba(255,177,66,.18),transparent 28%),linear-gradient(145deg,var(--bg),#140d1f);background-attachment:fixed}
-body.bg-midnight{background:radial-gradient(circle at 50% -10%,rgba(70,120,255,.2),transparent 35%),linear-gradient(180deg,#050914,var(--bg));background-attachment:fixed}
-body.bg-minimal{background:var(--bg)}
-body.bg-runeterra{background:
-radial-gradient(circle at 18% 20%,rgba(41,196,255,.20),transparent 25%),
-radial-gradient(circle at 82% 18%,rgba(255,194,74,.16),transparent 26%),
-linear-gradient(135deg,#07121d 0%,#10283a 48%,#1a160d 100%);background-attachment:fixed}
-body.bg-nightcity{background:
-radial-gradient(circle at 20% 18%,rgba(255,32,170,.22),transparent 24%),
-radial-gradient(circle at 82% 72%,rgba(0,225,255,.18),transparent 28%),
-linear-gradient(135deg,#090817 0%,#170d29 48%,#061b24 100%);background-attachment:fixed}
-body.bg-horror{background:
-radial-gradient(circle at 50% 20%,rgba(180,20,45,.18),transparent 30%),
-radial-gradient(circle at 15% 80%,rgba(70,0,15,.45),transparent 32%),
-linear-gradient(160deg,#09090b,#170a10 55%,#050506);background-attachment:fixed}
-body.bg-racing{background:
-linear-gradient(120deg,transparent 0 42%,rgba(255,255,255,.035) 42% 43%,transparent 43% 58%,rgba(255,255,255,.035) 58% 59%,transparent 59%),
-radial-gradient(circle at 80% 20%,rgba(255,65,45,.20),transparent 25%),#0a0d14;background-attachment:fixed}
-body.bg-elden{background:
-radial-gradient(circle at 52% 12%,rgba(225,181,75,.18),transparent 24%),
-radial-gradient(circle at 15% 75%,rgba(50,85,45,.18),transparent 30%),
-linear-gradient(150deg,#080b0b,#15140d 55%,#090b0c);background-attachment:fixed}
-body.bg-metro{background:
-repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 2px,transparent 2px 5px),
-radial-gradient(circle at 50% 80%,rgba(177,132,65,.16),transparent 30%),#0b0d0d;background-attachment:fixed}
-body.bg-overwatch{background:
-radial-gradient(circle at 25% 20%,rgba(255,166,0,.20),transparent 25%),
-radial-gradient(circle at 80% 75%,rgba(0,175,255,.20),transparent 28%),
-linear-gradient(135deg,#09121d,#10151f 50%,#10100c);background-attachment:fixed}
-body.bg-space{background:
-radial-gradient(circle at 20% 25%,rgba(125,91,255,.20),transparent 2%),
-radial-gradient(circle at 75% 35%,rgba(80,170,255,.18),transparent 2%),
-radial-gradient(circle at 60% 75%,rgba(255,255,255,.12),transparent 1.5%),
-radial-gradient(circle at 50% 10%,rgba(86,60,180,.18),transparent 35%),#03050d;background-attachment:fixed}
-
-
-.customize{display:none;margin-bottom:20px;padding:20px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:18px}
-.customize.show{display:block}
-.customize-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.customize-header h2{margin:0;font-size:22px}.customize-header p{margin:4px 0 0;color:var(--muted);font-size:12px}
-.settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.setting{background:rgba(255,255,255,.035);border-radius:14px;padding:14px}
-.setting label{display:block;font-weight:800;font-size:13px;margin-bottom:9px}
-.setting select,.setting input[type=color]{width:100%;border:0;border-radius:9px;background:#0d1527;color:var(--text);padding:10px;font-weight:700;outline:none}
-.setting input[type=color]{height:42px;padding:4px;cursor:pointer}
-.theme-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.theme-btn{padding:9px 7px;font-size:11px;background:var(--card2);border:2px solid transparent}
-.theme-btn.active{border-color:var(--accent);background:rgba(255,255,255,.08)}
-.setting-help{margin:-3px 0 10px;color:var(--muted);font-size:11px;line-height:1.45}.background-buttons{grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px}.background-btn{min-height:54px;font-size:12px}.background-btn[data-background="dark"]{background:linear-gradient(135deg,#0b1020,#202b58);color:#f1f5f9}.background-btn[data-background="light"]{background:linear-gradient(135deg,#eef2f7,#ffffff);color:#172033}
-.background-btn.active{box-shadow:0 0 0 2px rgba(255,255,255,.12) inset}
-.setting-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.switch{position:relative;width:46px;height:25px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#334155;border-radius:99px;cursor:pointer}.slider:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}.switch input:checked+.slider{background:var(--accent)}.switch input:checked+.slider:before{transform:translateX(21px)}
-.volume-row{display:flex;align-items:center;gap:10px}.volume-row input{flex:1;accent-color:var(--accent)}
-@media(max-width:650px){.settings-grid{grid-template-columns:1fr}.theme-buttons{grid-template-columns:repeat(2,1fr)}.textbox.text-large{font-size:25px}}
-
-
-/* Phase 2B : profil joueur + avatar */
-.profile-card{display:flex;align-items:center;gap:14px;margin:0 auto 20px;padding:14px 16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:18px;max-width:520px}
-.profile-avatar{width:58px;height:58px;display:grid;place-items:center;border-radius:16px;background:var(--card2);font-size:34px;flex:0 0 auto}
-.profile-info{min-width:0;flex:1}.profile-info strong{display:block;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.profile-info span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
-.profile-edit{padding:9px 12px;font-size:12px}
-.profile-editor{display:none;margin-bottom:20px;padding:20px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:18px}
-.profile-editor.show{display:block}.profile-editor h2{margin:0}.profile-editor p{color:var(--muted);font-size:12px;margin:5px 0 16px}
-.profile-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.profile-field{background:rgba(255,255,255,.035);border-radius:14px;padding:14px}.profile-field label{display:block;font-weight:800;font-size:13px;margin-bottom:9px}.profile-field input[type=text]{width:100%;border:0;border-radius:9px;background:#0d1527;color:var(--text);padding:11px;outline:none;font-weight:700}.avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}.avatar-btn{padding:9px 5px;font-size:25px;border:2px solid transparent}.avatar-btn.active{border-color:var(--accent);background:rgba(255,255,255,.08)}
-.profile-stat{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding:14px;background:#0d1527;border-radius:15px}.profile-stat .profile-avatar{width:52px;height:52px}.profile-stat strong{display:block;font-size:17px}.profile-stat span{color:var(--muted);font-size:12px}
-@media(max-width:650px){.profile-fields{grid-template-columns:1fr}.avatar-grid{grid-template-columns:repeat(4,1fr)}}
-.theme-btn-light{background:linear-gradient(180deg,#f8fafc,#e8edf4);color:#172033;border-color:rgba(23,32,51,.08)}
-.theme-btn-light.active{border-color:var(--accent);background:#ffffff;color:#172033}
-
-
-.training-screen{animation:uiIn .35s ease both}.training-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px}.training-head h2{margin:4px 0 6px;font-size:clamp(28px,4vw,40px)}.training-head p,.training-muted{margin:0;color:var(--muted)}.training-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.training-stat{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035)}.training-stat span{display:block;font-size:20px}.training-stat strong{display:block;font-size:23px}.training-stat small{color:var(--muted);font-size:11px}.training-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.training-card{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(255,255,255,.035);padding:20px}.training-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.training-card h3{margin:3px 0 0;font-size:19px}.training-kicker{font-size:10px;font-weight:900;letter-spacing:1.5px;color:var(--muted)}.training-level{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.06);font-size:11px;font-weight:800}.training-target{text-align:center;padding:16px 10px 12px}.training-target span{display:block;color:var(--muted);font-size:11px}.training-target strong{display:block;font-size:48px}.training-prompt{min-height:92px;padding:18px;border-radius:14px;background:#0d1527;border:1px solid rgba(255,255,255,.07);font-size:23px;line-height:1.65;letter-spacing:.8px;word-break:break-word}.training-prompt .correct{opacity:.45}.training-prompt .current{color:var(--accent);text-decoration:underline}.training-prompt .wrong{color:var(--danger);text-decoration:underline}.training-input{width:100%;margin-top:12px;min-height:54px;border:1px solid #2b3856;border-radius:12px;background:#0a1120;color:var(--text);padding:13px 15px;font:inherit;font-weight:700;outline:none}.training-input:focus{border-color:var(--accent)}.training-progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:15px;margin-bottom:7px}.training-progress{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.training-progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}.training-feedback{min-height:20px;color:var(--muted);font-size:12px}.training-weak-keys{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.training-key-chip,.training-key-row{padding:9px 10px;border-radius:11px;background:#0d1527;border:1px solid rgba(255,255,255,.08);text-align:center}.training-key-chip strong{display:block;font-size:17px}.training-key-chip small,.training-key-row span{color:var(--muted);font-size:10px}.training-empty{margin-top:14px;padding:14px;border-radius:12px;background:rgba(255,255,255,.03);color:var(--muted);font-size:12px}.training-history-card{margin-top:14px}.training-reset{border:1px solid var(--ui-border);background:rgba(255,255,255,.045);color:var(--text);border-radius:10px;padding:8px 11px;font-weight:800;cursor:pointer}.training-key-table{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:14px}.training-key-row strong{font-size:17px}.training-key-row span{display:block;margin-top:3px}@media(max-width:760px){.training-overview{grid-template-columns:repeat(2,1fr)}.training-grid{grid-template-columns:1fr}.training-key-table{grid-template-columns:repeat(4,1fr)}.training-head{flex-direction:column}.training-head .game-home{align-self:stretch}}@media(max-width:450px){.training-key-table{grid-template-columns:repeat(3,1fr)}.training-prompt{font-size:20px}}
-
-.learning-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:22px}.learning-card{min-height:180px;padding:22px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:var(--card2);color:var(--text);text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:9px;transition:.15s}.learning-card span{font-size:34px}.learning-card strong{font-size:18px}.learning-card small{color:var(--muted);line-height:1.5}.learning-card:hover{transform:translateY(-2px);border-color:var(--accent)}.learning-note{margin-top:16px;padding:15px;border-radius:14px;background:rgba(124,92,255,.08);color:var(--muted)}.row-training-card{padding:22px}.row-training-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.row-target{text-align:center;font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:.12em;margin:24px 0 8px}.row-guidance{text-align:center;color:var(--muted);min-height:25px}.row-keyboard{display:grid;gap:7px;margin:22px auto;max-width:900px;overflow-x:auto}.row-line{display:flex;justify-content:center;gap:6px;min-width:max-content}.row-key{min-width:39px;height:48px;padding:0 9px;border-radius:9px;border:1px solid #303846;background:#1a2230;color:inherit;font-weight:800;display:flex;align-items:center;justify-content:center}.row-key.target{outline:3px solid var(--accent);transform:scale(1.06)}.row-key.good{outline:2px solid #4ade80}.row-key.bad{outline:2px solid var(--danger)}.row-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}.row-level{padding:14px;border:1px solid #303846;border-radius:14px;background:transparent;color:inherit;text-align:left;cursor:pointer}.row-level.active{border-color:var(--accent);background:rgba(124,92,255,.1)}.row-progress{height:9px;border-radius:99px;background:#202838;overflow:hidden;margin-top:16px}.row-progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .18s}@media(max-width:760px){.learning-grid,.row-levels{grid-template-columns:1fr}.row-key{min-width:31px;height:43px;font-size:12px;padding:0 6px}}
-
-/* Correction navigation : pas de barre supérieure globale. */
-.top-bar,.topbar,.site-topbar,.app-topbar,#topBar,#topbar{display:none!important;}
-/* Phase 5 : position des doigts */
-.finger-training-card{padding:22px}
-.finger-hero{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-bottom:18px}
-.finger-lesson{padding:20px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(255,255,255,.035)}
-.finger-lesson h3{margin:4px 0 7px;font-size:22px}
-.finger-lesson p{margin:0;color:var(--muted);line-height:1.6}
-.finger-target-wrap{display:flex;align-items:center;justify-content:center;min-height:150px;border-radius:16px;background:#0d1527;border:1px solid rgba(255,255,255,.07);text-align:center}
-.finger-target-label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1.4px}
-.finger-target-key{display:block;font-size:58px;font-weight:900;line-height:1;margin-top:8px}
-.finger-target-finger{display:block;margin-top:8px;font-size:13px;color:var(--accent2);font-weight:800}
-.finger-keyboard{display:grid;gap:7px;margin:18px auto 20px;max-width:980px;overflow-x:auto;padding-bottom:3px}
-.finger-row{display:flex;justify-content:center;gap:6px;min-width:max-content}
-.finger-key{min-width:40px;height:46px;padding:0 9px;border-radius:9px;border:1px solid #303846;background:#1a2230;color:inherit;font-weight:800;display:flex;align-items:center;justify-content:center;transition:.15s;position:relative}
-.finger-key small{position:absolute;bottom:3px;right:5px;font-size:8px;color:var(--muted);font-weight:700;opacity:.75}
-.finger-key.target{outline:3px solid var(--accent);transform:translateY(-2px) scale(1.06);box-shadow:0 0 0 5px rgba(124,92,255,.12)}
-.finger-key.bad{outline:2px solid var(--danger);animation:fingerShake .18s linear}
-.finger-key.home-key{box-shadow:inset 0 -3px 0 rgba(255,255,255,.18)}
-.finger-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
-.finger-legend-item{padding:12px;border-radius:14px;background:#0d1527;border:1px solid rgba(255,255,255,.07);font-size:12px}
-.finger-dot{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:-1px}
-.finger-hands{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.finger-hand{padding:14px;border-radius:14px;background:#0d1527;border:1px solid rgba(255,255,255,.07)}
-.finger-hand strong{display:block;margin-bottom:8px}
-.finger-hand-line{display:flex;flex-wrap:wrap;gap:7px}
-.finger-pill{padding:7px 9px;border-radius:10px;font-size:11px;font-weight:800;background:rgba(255,255,255,.055)}
-.finger-pill span{color:var(--muted);font-weight:600;margin-left:4px}
-.finger-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
-.finger-level{padding:14px;border:1px solid #303846;border-radius:14px;background:transparent;color:inherit;text-align:left;cursor:pointer}
-.finger-level strong{display:block;font-size:14px;margin-bottom:4px}
-.finger-level small{color:var(--muted);line-height:1.45}
-.finger-level.active{border-color:var(--accent);background:rgba(124,92,255,.1)}
-.finger-progress{height:9px;border-radius:99px;background:#202838;overflow:hidden;margin-top:15px}
-.finger-progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .18s}
-.finger-feedback{min-height:22px;margin:12px 0 0;color:var(--muted);font-size:12px;text-align:center}
-.finger-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
-@keyframes fingerShake{0%,100%{transform:translateX(0)}35%{transform:translateX(-4px)}70%{transform:translateX(4px)}}
-.learning-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:22px}.learning-card{min-height:180px;padding:22px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:var(--card2);color:var(--text);text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:9px;transition:.15s}.learning-card span{font-size:34px}.learning-card strong{font-size:18px}.learning-card small{color:var(--muted);line-height:1.5}.learning-card:hover{transform:translateY(-2px);border-color:var(--accent)}.learning-note{margin-top:16px;padding:15px;border-radius:14px;background:rgba(124,92,255,.08);color:var(--muted)}.row-training-card{padding:22px}.row-training-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.row-target{text-align:center;font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:.12em;margin:24px 0 8px}.row-guidance{text-align:center;color:var(--muted);min-height:25px}.row-keyboard{display:grid;gap:7px;margin:22px auto;max-width:900px;overflow-x:auto}.row-line{display:flex;justify-content:center;gap:6px;min-width:max-content}.row-key{min-width:39px;height:48px;padding:0 9px;border-radius:9px;border:1px solid #303846;background:#1a2230;color:inherit;font-weight:800;display:flex;align-items:center;justify-content:center}.row-key.target{outline:3px solid var(--accent);transform:scale(1.06)}.row-key.good{outline:2px solid #4ade80}.row-key.bad{outline:2px solid var(--danger)}.row-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}.row-level{padding:14px;border:1px solid #303846;border-radius:14px;background:transparent;color:inherit;text-align:left;cursor:pointer}.row-level.active{border-color:var(--accent);background:rgba(124,92,255,.1)}.row-progress{height:9px;border-radius:99px;background:#202838;overflow:hidden;margin-top:16px}.row-progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .18s}@media(max-width:760px){.learning-grid,.row-levels{grid-template-columns:1fr}.row-key{min-width:31px;height:43px;font-size:12px;padding:0 6px}}
-
-
-
-/* Mode clair : zone du test de frappe en violet */
-body.bg-light #game .textbox{
-  background:linear-gradient(135deg,#f3efff,#ebe7ff);
-  border:1px solid rgba(112,87,232,.28);
-  color:#252043;
-}
-body.bg-light #game #input{
-  background:linear-gradient(135deg,#faf8ff,#eeeaff);
-  border:1px solid rgba(112,87,232,.30);
-  color:#252043;
-}
-body.bg-light #game #input:focus{
-  border-color:#7057e8;
-  box-shadow:0 0 0 3px rgba(112,87,232,.16);
-}
-body.bg-light #game .stat{
-  background:linear-gradient(135deg,#f6f2ff,#ece9ff);
-  border:1px solid rgba(112,87,232,.18);
-}
-body.bg-light #game .stat strong{color:#5b43c7}
-body.bg-light #game .progress{background:#ddd6fb}
-body.bg-light #game #bar{background:linear-gradient(90deg,#7057e8,#8b6cff)}
-body.bg-light #game .combo-badge{
-  background:linear-gradient(135deg,rgba(112,87,232,.14),rgba(139,108,255,.10));
-  border-color:rgba(112,87,232,.30);
-}
-</style>
-<script>
-/* Navigation globale : disponible avant le chargement des modules. */
-window.showLearningHub = function(){
-  document.body.classList.remove("module-mode");
-  const ids = ["homeScreen","learningHub","trainingScreen","rowTrainingScreen","fingerTrainingScreen","statistics","customize","profileEditor","result","game","workspace"];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.remove("show");
-    el.style.display = "none";
-  });
-  const hub = document.getElementById("learningHub");
-  if (!hub) return;
-  hub.classList.add("show");
-  hub.style.display = "block";
-  window.scrollTo(0,0);
-};
-window.showLearningModule = function(id){
-  document.body.classList.add("module-mode");
-  ["homeScreen","learningHub","trainingScreen","rowTrainingScreen","fingerTrainingScreen","statistics","customize","profileEditor","result","game","workspace"].forEach(name => {
-    const el=document.getElementById(name);
-    if(!el) return;
-    el.classList.remove("show");
-    el.style.display="none";
-  });
-  const target=document.getElementById(id);
-  if(!target) return;
-  target.classList.add("show");
-  target.style.display="block";
-  window.scrollTo(0,0);
-};
-</script>
-<style>
-/* Refonte légère des boutons de navigation des modules */
-.learning-module-bar .game-home,.learning-module-bar .module-restart,.customize-header>button,.profile-editor .customize-header>button,.stats-header #backToGame{
-  min-height:44px;padding:11px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.10);font-weight:900;
-}
-.learning-module-bar .game-home:hover,.customize-header>button:hover,.profile-editor .customize-header>button:hover,.stats-header #backToGame:hover{
-  border-color:var(--accent);background:var(--card2);
-}
-@media(max-width:650px){
-  .learning-module-bar .game-home,.learning-module-bar .module-restart,.customize-header>button,.profile-editor .customize-header>button,.stats-header #backToGame{width:100%;}
-}
-</style>
-<style>
-
-/* ===== CORRECTION MODE CLAIR — contraste violet/bleu ===== */
-body.bg-light .controls > button,
-body.bg-light #homeResult,
-body.bg-light .game-home,
-body.bg-light .result-actions .action-home,
-body.bg-light .difficulty-badge,
-body.bg-light .theme-btn,
-body.bg-light .background-btn,
-body.bg-light .module-restart,
-body.bg-light .module-home,
-body.bg-light .row-level {
-  background:linear-gradient(135deg,#f0efff,#e8edff) !important;
-  color:#3f3a78 !important;
-  border:1px solid #c9c4f5 !important;
-}
-
-body.bg-light .controls > button:not(#newGame).active,
-body.bg-light button.active,
-body.bg-light .theme-btn.active,
-body.bg-light .row-level.active {
-  background:linear-gradient(135deg,#7057e8,#5b72e9) !important;
-  color:#ffffff !important;
-  border-color:#7057e8 !important;
-}
-
-body.bg-light #newGame {
-  background:linear-gradient(135deg,#74d48b,#58bf78) !important;
-  color:#123621 !important;
-  border:1px solid #49ad69 !important;
-}
-
-body.bg-light .controls > button:not(#newGame):hover,
-body.bg-light #homeResult:hover,
-body.bg-light .game-home:hover,
-body.bg-light .module-restart:hover,
-body.bg-light .module-home:hover {
-  background:linear-gradient(135deg,#e8e5ff,#e4ebff) !important;
-  color:#332d70 !important;
-  border-color:#9f96ea !important;
-}
-
-body.bg-light .controls > button:not(#newGame).active:hover,
-body.bg-light button.active:hover,
-body.bg-light .theme-btn.active:hover {
-  background:linear-gradient(135deg,#6348d7,#4f66dc) !important;
-  color:#ffffff !important;
-}
-
-body.bg-light #newGame:hover {
-  background:linear-gradient(135deg,#62c97d,#4eb86d) !important;
-  color:#102f1e !important;
-}
-
-/* Les petits textes/icônes du menu restent lisibles en clair. */
-body.bg-light .home-btn:not(.home-btn--primary),
-body.bg-light .home-btn:not(.home-btn--primary) .home-btn__icon,
-body.bg-light .home-btn:not(.home-btn--primary) .home-btn__text {
-  color:#433b91 !important;
-}
-body.bg-light .home-btn:not(.home-btn--primary) {
-  background:linear-gradient(135deg,#f1efff,#eaf0ff) !important;
-  border-color:#c9c4f5 !important;
-}
-body.bg-light .home-btn:not(.home-btn--primary):hover {
-  color:#342b7c !important;
-  background:linear-gradient(135deg,#e9e6ff,#e3edff) !important;
-  border-color:#a69ce8 !important;
-}
-body.bg-light .home-btn--primary,
-body.bg-light .home-btn--primary .home-btn__icon,
-body.bg-light .home-btn--primary .home-btn__text {
-  color:#ffffff !important;
-}
-
-body.bg-light .timer-control,
-body.bg-light .timer-control span,
-body.bg-light .stats .stat span,
-body.bg-light .stats .stat strong,
-body.bg-light .help,
-body.bg-light .subtitle,
-body.bg-light label,
-body.bg-light .setting label,
-body.bg-light .customize-header h2,
-body.bg-light .customize-header p {
-  color:#4a438f !important;
-}
-body.bg-light .customize-header>button,
-body.bg-light .profile-editor .customize-header>button,
-body.bg-light .stats-header #backToGame {
-  background:linear-gradient(135deg,#e7e3ff,#dfe8ff) !important;
-  color:#342a78 !important;
-  border:1px solid #9d94df !important;
-  box-shadow:0 3px 10px rgba(77,65,150,.12) !important;
-  opacity:1 !important;
-}
-body.bg-light .customize-header>button:hover,
-body.bg-light .profile-editor .customize-header>button:hover,
-body.bg-light .stats-header #backToGame:hover {
-  background:linear-gradient(135deg,#dcd6ff,#d6e2ff) !important;
-  color:#241b63 !important;
-  border-color:#7668cf !important;
-}
-
-body.bg-light .timer-control select,
-body.bg-light .timer-control input,
-body.bg-light select,
-body.bg-light input,
-body.bg-light textarea {
-  background:#f1efff !important;
-  color:#302b62 !important;
-  border-color:#c7c1ef !important;
-}
-body.bg-light select option {
-  background:#f1efff;
-  color:#302b62;
-}
-
-/* Tous les chiffres importants restent violets/bleus, jamais noirs. */
-body.bg-light .stat strong,
-body.bg-light .stat-card .value,
-body.bg-light .home-stat .value,
-body.bg-light .mini-stat b,
-body.bg-light .training-stat strong,
-body.bg-light .profile-stat strong,
-body.bg-light .profile-info strong,
-body.bg-light .resultValue,
-body.bg-light .result-value {
-  color:#5b4bd6 !important;
-}
-
 </style>
 </head>
 <body>
-<main class="app">
+<div class="app">
 <header>
-  <div class="profile-card" style="max-width:none;margin:0 0 18px">
-    <div class="logo">⌨️ TYPERUSH</div>
-    <div id="homeAvatar" class="profile-avatar" aria-hidden="true">😎</div>
-    <div class="profile-info"><strong id="homePlayerName">TypeRush</strong><span>👤 Profil joueur</span></div>
-  </div>
+  <div class="logo">⌨️ Test de rapidité clavier</div>
+  <div class="badge">Apprendre • S'entraîner • Progresser</div>
 </header>
 
-<section id="homeScreen" class="home-screen show" aria-label="Accueil TypeRush">
-  <div class="home-hero">
-    <div class="home-kicker">⌨️ TypeRush</div>
-    <h1 class="home-title">TYPERUSH</h1>
-    <p class="home-subtitle">Améliore ta vitesse de frappe, bats tes records et construis ton meilleur combo.</p>
-  </div>
-
-  <nav class="home-actions" aria-label="Navigation principale">
-    <button type="button" id="homePlay" class="home-btn home-btn--primary" aria-label="Jouer à TypeRush">
-      <span class="home-btn__icon" aria-hidden="true">🎮</span>
-      <span class="home-btn__text">Jouer</span>
-    </button>
-    <button type="button" id="homeStats" class="home-btn" aria-label="Afficher les statistiques">
-      <span class="home-btn__icon" aria-hidden="true">📊</span>
-      <span class="home-btn__text">Statistiques</span>
-    </button>
-    <button type="button" id="homeCustomize" class="home-btn" aria-label="Ouvrir la personnalisation">
-      <span class="home-btn__icon" aria-hidden="true">🎨</span>
-      <span class="home-btn__text">Personnalisation</span>
-    </button>
-    <button type="button" id="homeProfile" class="home-btn" aria-label="Ouvrir le profil">
-      <span class="home-btn__icon" aria-hidden="true">👤</span>
-      <span class="home-btn__text">Profil</span>
-    </button>
-    <button type="button" id="homeTraining" class="home-btn" aria-label="Ouvrir l'apprentissage">
-      <span class="home-btn__icon" aria-hidden="true">🧠</span>
-      <span class="home-btn__text">Apprentissage</span>
-    </button>
-  </nav>
-
-  <section class="home-summary" aria-label="Résumé des performances">
-    <div class="home-stat"><div class="icon" aria-hidden="true">🏆</div><div class="value" id="homeBestWpm">0</div><div class="label">Meilleur WPM</div></div>
-    <div class="home-stat"><div class="icon" aria-hidden="true">🔥</div><div class="value" id="homeBestCombo">0</div><div class="label">Meilleur combo</div></div>
-    <div class="home-stat"><div class="icon" aria-hidden="true">🎯</div><div class="value" id="homeAvgAccuracy">100%</div><div class="label">Précision moyenne</div></div>
-    <div class="home-stat"><div class="icon" aria-hidden="true">🎮</div><div class="value" id="homeGames">0</div><div class="label">Parties jouées</div></div>
-  </section>
-  <p class="home-stat-note">Tes performances sont enregistrées automatiquement dans ce navigateur.</p>
-</section>
-
-<section class="panel" id="learningHub" style="display:none" aria-label="Apprentissage clavier">
-  <div class="training-head"><div><div class="home-kicker">🧠 PHASE 5</div><h2>Apprentissage</h2><p>Apprends à taper plus vite grâce à des exercices progressifs.</p></div><button type="button" id="learningBack" class="game-home">🏠 Accueil</button></div>
-  <div class="learning-grid">
-    <button type="button" class="learning-card" id="openTargeted"><span>🎯</span><strong>Touches ciblées</strong><small>Travaille les touches où tu fais le plus d’erreurs.</small></button>
-    <button type="button" class="learning-card" id="openRows"><span>⌨️</span><strong>Les rangées du clavier</strong><small>Apprends les rangées du clavier AZERTY progressivement.</small></button>
-    <button type="button" class="learning-card" id="openFinger"><span>🖐️</span><strong>Position des doigts</strong><small>Apprends où placer tes doigts sur le clavier.</small></button>
-  </div>
-  <div class="learning-note">💡 Conseil : commence par la position des doigts, puis travaille les rangées et termine par les touches qui te posent problème.</div>
-</section>
-
-<section class="panel" id="trainingScreen" style="display:none" aria-label="Entraînement ciblé">
-  <div class="learning-module-bar">
-    <button type="button" id="trainingBack" class="game-home">🧠 Apprentissage</button>
-    <span class="module-title">🎯 Entraînement ciblé</span>
-    <button type="button" id="trainingModuleRestart" class="module-restart">↻ Recommencer</button>
-  </div>
-  <div class="training-head"><div><div class="home-kicker">🧠 PHASE 5</div><h2>Entraînement ciblé</h2><p>Travaille les touches où tu fais le plus d'erreurs.</p></div></div>
-  <div class="training-overview">
-    <div class="training-stat"><span>🎯</span><strong id="trainingAccuracy">100%</strong><small>Précision</small></div>
-    <div class="training-stat"><span>❌</span><strong id="trainingErrors">0</strong><small>Erreurs</small></div>
-    <div class="training-stat"><span>🔥</span><strong id="trainingBestCombo">0</strong><small>Meilleur combo</small></div>
-    <div class="training-stat"><span>⌨️</span><strong id="trainingSessions">0</strong><small>Sessions</small></div>
-  </div>
-  <div class="training-grid">
-    <div class="training-card"><div class="training-card-head"><div><span class="training-kicker">EXERCICE</span><h3>Touches ciblées</h3></div><span class="training-level" id="trainingLevel">Niveau 1</span></div>
-      <div class="training-target"><span>Prochaine touche</span><strong id="trainingTargetKey">A</strong></div>
-      <div class="training-prompt" id="trainingPrompt"></div>
-      <input id="trainingInput" class="training-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Tape l'exercice affiché" placeholder="Clique ici puis tape...">
-      <div class="training-progress-label"><span>Progression</span><strong id="trainingProgressText">0 / 10</strong></div><div class="training-progress"><span id="trainingProgressBar"></span></div>
-      <p id="trainingFeedback" class="training-feedback" aria-live="polite">Tape exactement ce qui est affiché.</p>
-    </div>
-    <div class="training-card"><div class="training-card-head"><div><span class="training-kicker">ERREURS</span><h3>Touches à travailler</h3></div></div><p class="training-muted">Les touches sont classées selon tes erreurs enregistrées.</p><div id="trainingWeakKeys" class="training-weak-keys"></div><div id="trainingNoErrors" class="training-empty">Aucune erreur enregistrée. Continue comme ça ! 💪</div></div>
-  </div>
-  <div class="training-card training-history-card"><div class="training-card-head"><div><span class="training-kicker">SUIVI</span><h3>Erreurs par touche</h3></div><button type="button" id="trainingResetErrors" class="training-reset">Réinitialiser</button></div><div id="trainingKeyTable" class="training-key-table"></div></div>
-</section>
-<section class="panel" id="workspace" style="display:none">
-  <div class="controls">
-    <button class="diff active" data-diff="easy">Facile</button>
-    <button class="diff" data-diff="medium">Moyen</button>
-    <button class="diff" data-diff="hard">Difficile</button>
-    <label class="timer-control">
-      <span>⏱️ Temps</span>
-      <select id="timerSelect" aria-label="Durée du test">
-        <option value="15">15 secondes</option>
-        <option value="30" selected>30 secondes</option>
-        <option value="60">1 minute</option>
-        <option value="120">2 minutes</option>
-        <option value="custom">Personnalisé</option>
-      </select>
-      <input id="customTime" type="number" min="5" max="600" value="30"
-             aria-label="Durée personnalisée en secondes" hidden>
-    </label>
-    <button id="gameHome" class="game-home">🏠 Accueil</button>
-    <button id="newGame">↻ Nouvelle partie</button>
-    <button id="showStats">📊 Statistiques</button>
-    <button id="showCustomize">🎨 Personnaliser</button>
-  </div>
-
-
-  <div id="profileEditor" class="profile-editor">
-    <div class="customize-header">
-      <div><h2>👤 Mon profil</h2><p>Ton nom et ton avatar sont sauvegardés automatiquement dans ce navigateur.</p></div>
-      <button id="closeProfile">✕ Fermer</button>
-    </div>
-    <div class="profile-fields">
-      <div class="profile-field">
-        <label for="playerName">✏️ Nom du joueur</label>
-        <input id="playerName" type="text" maxlength="20" placeholder="Ton nom" autocomplete="off">
-      </div>
-      <div class="profile-field">
-        <label>🙂 Choisis ton avatar</label>
-        <div id="avatarGrid" class="avatar-grid"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="customize" class="customize">
-    <div class="customize-header">
-      <div><h2>🎨 Personnaliser TypeRush</h2><p>Tes préférences sont enregistrées automatiquement dans ce navigateur.</p></div>
-      <button id="closeCustomize">✕ Fermer</button>
-    </div>
-    <div class="settings-grid">
-      <div class="setting" style="grid-column:1/-1">
-        <label>🌈 Thème de l’interface</label>
-        <p class="setting-help">Le thème change les couleurs de l’interface. Le fond de page reste indépendant.</p>
-        <div class="theme-buttons">
-          <button type="button" class="theme-btn" data-theme="obsidian">🌑 Obsidienne</button>
-          <button type="button" class="theme-btn" data-theme="violet">💜 Néon violet</button>
-          <button type="button" class="theme-btn" data-theme="cyber">🔵 Cyber bleu</button>
-          <button type="button" class="theme-btn" data-theme="ocean">🌊 Océan</button>
-          <button type="button" class="theme-btn" data-theme="forest">🌲 Forêt</button>
-          <button type="button" class="theme-btn" data-theme="inferno">🔥 Inferno</button>
-        </div>
-      </div>
-      <div class="setting" style="grid-column:1/-1">
-        <label for="backgroundChoice">🖼️ Fond de la page</label>
-        <p class="setting-help">Le fond change directement, sans modifier les couleurs ni le thème de l interface.</p>
-        <select id="backgroundChoice">
-          <option value="dark">🌑 Sombre</option>
-          <option value="light">☀️ Clair</option>
-          <option value="default">🌌 Profond</option>
-          <option value="aurora">🌈 Aurore</option>
-          <option value="grid">▦ Cyber grille</option>
-          <option value="sunset">🌅 Crépuscule</option>
-          <option value="midnight">🌙 Minuit</option>
-          <option value="minimal">⬛ Minimal</option>
-          <option value="runeterra">⚔️ Runeterra</option>
-          <option value="nightcity">🌃 Night City</option>
-          <option value="horror">👁️ Horreur</option>
-          <option value="racing">🏎️ Racing</option>
-          <option value="elden">🗡️ Royaume sombre</option>
-          <option value="metro">☢️ Métro post-apo</option>
-          <option value="overwatch">🤖 Futur héroïque</option>
-          <option value="space">🚀 Espace</option>
-        </select>
-      </div>
-      <div class="setting">
-        <label for="accentColor">🎨 Couleur d'accent</label>
-        <input id="accentColor" type="color" value="#7c5cff">
-      </div>
-      <div class="setting">
-        <label for="textSize">🔤 Taille du texte</label>
-        <select id="textSize"><option value="small">Petite</option><option value="normal" selected>Normale</option><option value="large">Grande</option></select>
-      </div>
-      <div class="setting">
-        <label for="fontChoice">🖋️ Police</label>
-        <select id="fontChoice"><option value="modern">Moderne</option><option value="mono">Monospace</option><option value="cyber">Cyber</option><option value="classic">Classique</option></select>
-      </div>
-      <div class="setting">
-        <label for="animationStyle">🎬 Style des animations</label>
-        <select id="animationStyle">
-          <option value="classic">Classique</option>
-          <option value="new" selected>Nouvelles animations</option>
-        </select>
-      </div>
-      <div class="setting">
-        <div class="setting-row"><label style="margin:0">✨ Animations</label><label class="switch"><input id="animationsToggle" type="checkbox" checked><span class="slider"></span></label></div>
-      </div>
-      <div class="setting">
-        <div class="setting-row"><label style="margin:0">🔊 Sons</label><label class="switch"><input id="soundsToggle" type="checkbox" checked><span class="slider"></span></label></div>
-      </div>
-      <div class="setting" style="grid-column:1/-1">
-        <label>🔉 Volume</label>
-        <div class="volume-row"><span>0</span><input id="volumeControl" type="range" min="0" max="100" value="35"><span>100</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><span>Temps</span><strong id="time">30</strong></div>
-    <div class="stat"><span>Vitesse</span><strong id="wpm">0</strong></div>
-    <div class="stat"><span>Précision</span><strong id="accuracy">100%</strong></div>
-    <div class="stat"><span>Erreurs</span><strong id="errors">0</strong></div>
-  </div>
-
-  <div id="game">
-    <div class="combo-bar" aria-live="polite" aria-label="Progression du combo">
-      <div id="comboBadge" class="combo-badge"><span>🔥 COMBO</span><span id="comboCount" class="combo-number">0</span></div>
-      <div id="comboMessage" class="combo-message">Chaque caractère correct augmente ton combo.</div>
-      <div class="combo-best">Record : <strong id="comboBestCount">0</strong></div>
-    </div>
-    <div id="text" class="textbox"></div>
-    <textarea id="input" spellcheck="false" autocomplete="off" autocorrect="off"
-      placeholder="Clique ici et commence à taper..."></textarea>
-    <div class="progress"><div id="bar"></div></div>
-    <p class="help">Le chrono démarre automatiquement. Les phrases s’enchaînent sans répétition pendant la partie.</p>
-  </div>
-
-  <div id="result" class="result" aria-live="polite">
-    <div class="result-header">
-      <h2 class="result-title">🏁 Partie terminée !</h2>
-      <p class="result-subtitle">Voici le résumé de ta performance.</p>
-    </div>
-    <div class="result-main">
-      <div class="big" id="finalWpm">0</div>
-      <div class="wpm-label">mots par minute — WPM</div>
-      <div class="score-line">Score : <strong id="finalScore">0</strong></div>
-    </div>
-    <div class="result-grid">
-      <div class="resultBox result-combo"><b id="finalComboValue">0</b><span>🔥 Meilleur combo</span></div>
-      <div class="resultBox result-accuracy"><b id="finalAccuracy">0%</b><span>🎯 Précision</span></div>
-      <div class="resultBox result-errors"><b id="finalErrors">0</b><span>❌ Erreurs</span></div>
-      <div class="resultBox result-time"><b id="finalTime">0 s</b><span>⏱️ Temps</span></div>
-      <div class="resultBox result-score"><b id="finalScoreSmall">0</b><span>🏆 Score</span></div>
-    </div>
-    <p id="best" class="record-message"></p>
-    <div class="result-actions" aria-label="Actions de fin de partie">
-      <button id="again" class="action-replay" type="button" aria-label="Rejouer une nouvelle partie"><span class="action-icon" aria-hidden="true">🔄</span>Rejouer</button>
-      <button id="homeResult" class="action-home" type="button" aria-label="Retourner à l'accueil"><span class="action-icon" aria-hidden="true">🏠</span>Accueil</button>
-    </div>
-  </div>
-
-  <div id="statistics">
-    <div class="stats-header">
-      <div>
-        <h2>📊 Mes statistiques</h2>
-        <p>Les résultats sont enregistrés automatiquement dans ce navigateur.</p>
-      </div>
-      <button id="backToGame">← Retour au jeu</button>
-    </div>
-
-    <div class="profile-stat">
-      <div id="statsAvatar" class="profile-avatar">😎</div>
-      <div><strong id="statsPlayerName">TypeRush</strong><span>👤 Profil joueur</span></div>
-    </div>
-
-    <div class="stats-cards">
-      <div class="stat-card"><div class="icon">🎮</div><div class="value" id="statGames">0</div><div class="label">Parties jouées</div></div>
-      <div class="stat-card"><div class="icon">🏆</div><div class="value" id="statBestWpm">0</div><div class="label">Meilleur WPM</div></div>
-      <div class="stat-card"><div class="icon">🔥</div><div class="value" id="statBestCombo">0</div><div class="label">Meilleur combo</div></div>
-      <div class="stat-card"><div class="icon">📈</div><div class="value" id="statAvgWpm">0</div><div class="label">WPM moyen</div></div>
-      <div class="stat-card"><div class="icon">🎯</div><div class="value" id="statBestAccuracy">0%</div><div class="label">Meilleure précision</div></div>
-      <div class="stat-card"><div class="icon">📊</div><div class="value" id="statAvgAccuracy">0%</div><div class="label">Précision moyenne</div></div>
-      <div class="stat-card"><div class="icon">⌨️</div><div class="value" id="statTyped">0</div><div class="label">Caractères tapés</div></div>
-      <div class="stat-card"><div class="icon">✅</div><div class="value" id="statCorrect">0</div><div class="label">Caractères corrects</div></div>
-      <div class="stat-card"><div class="icon">❌</div><div class="value" id="statErrors">0</div><div class="label">Erreurs</div></div>
-      <div class="stat-card"><div class="icon">⏱️</div><div class="value" id="statTime">0 s</div><div class="label">Temps total</div></div>
-    </div>
-
-    <div class="history-panel">
-      <h3>📈 Évolution du WPM</h3>
-      <div id="wpmChart" class="chart"><div class="empty-history">Joue quelques parties pour voir ton évolution.</div></div>
-    </div>
-
-    <div class="history-panel">
-      <h3>📜 Historique</h3>
-      <div class="history-summary">
-        <div class="mini-stat"><b id="historyCount">0</b><span>Parties</span></div>
-        <div class="mini-stat"><b id="historyBest">0 WPM</b><span>Record</span></div>
-        <div class="mini-stat"><b id="historyErrors">0</b><span>Erreurs</span></div>
-        <div class="mini-stat"><b id="historyTime">0 s</b><span>Temps</span></div>
-      </div>
-      <div id="historyList" class="history-list"><div class="empty-history">Aucune partie enregistrée pour le moment.</div></div>
-      <div class="history-actions">
-        <span style="color:var(--muted);font-size:12px">Les 500 dernières parties sont conservées.</span>
-        <button id="clearHistory" class="danger-btn">🗑️ Effacer l’historique</button>
+<main>
+<section id="homeScreen" class="screen active">
+  <div class="hero">
+    <div class="hero-card">
+      <div style="font-size:4rem">⌨️</div>
+      <h1>Test de rapidité clavier</h1>
+      <p class="subtitle">Apprends à utiliser ton clavier pas à pas, puis mesure ta vitesse sur un test d'une minute.</p>
+      <div class="actions">
+        <button class="btn btn-primary" id="startTestHome">⚡ Test d'1 minute</button>
+        <button class="btn btn-secondary" id="openLearning">🧠 Apprentissage</button>
       </div>
     </div>
   </div>
 </section>
-<section class="panel" id="fingerTrainingScreen" style="display:none" aria-label="Position des doigts">
-  <div class="learning-module-bar">
-    <button type="button" id="fingerHome" class="game-home">🧠 Apprentissage</button>
-    <span class="module-title">🖐️ Position des doigts</span>
-    <button type="button" id="fingerRestartTop" class="module-restart">↻ Recommencer</button>
+
+<section id="learningScreen" class="screen">
+  <div class="section-head">
+    <div>
+      <h2>🧠 Apprentissage</h2>
+      <p style="color:var(--muted)">10 étapes pour progresser du clavier aux phrases.</p>
+    </div>
+    <button class="btn btn-secondary" id="backHomeLearning">Accueil</button>
   </div>
-  <div class="training-head"><div><div class="home-kicker">🖐️ PHASE 5</div><h2>Position des doigts</h2><p>Apprends où poser chaque doigt et à quelles touches il doit accéder.</p></div></div>
+  <div class="grid" id="levelGrid"></div>
+</section>
 
-  <div class="finger-hero">
-    <div class="finger-lesson">
-      <div class="training-kicker">AVANT DE COMMENCER</div>
-      <h3>La position de base</h3>
-      <p>Pose tes index sur <strong>F</strong> et <strong>J</strong>. Les autres doigts se placent à côté, sur la ligne de repos. Garde les poignets détendus et reviens à cette position après chaque déplacement.</p>
-      <div class="finger-hands">
-        <div class="finger-hand"><strong>🤚 Main gauche</strong><div class="finger-hand-line">
-          <span class="finger-pill">Auriculaire <span>Q</span></span><span class="finger-pill">Annulaire <span>Z</span></span><span class="finger-pill">Majeur <span>D</span></span><span class="finger-pill">Index <span>F · G</span></span>
-        </div></div>
-        <div class="finger-hand"><strong>🤚 Main droite</strong><div class="finger-hand-line">
-          <span class="finger-pill">Index <span>H · J</span></span><span class="finger-pill">Majeur <span>K</span></span><span class="finger-pill">Annulaire <span>L</span></span><span class="finger-pill">Auriculaire <span>M</span></span>
-        </div></div>
-      </div>
+<section id="exerciseScreen" class="screen">
+  <div class="section-head">
+    <div>
+      <h2 id="exerciseTitle">Exercice</h2>
+      <p id="exerciseSubtitle"></p>
     </div>
-    <div class="finger-target-wrap">
-      <div><span class="finger-target-label">Touche à faire</span><strong id="fingerTargetKey" class="finger-target-key">F</strong><span id="fingerTargetFinger" class="finger-target-finger">☝️ Index gauche</span></div>
-    </div>
+    <button class="btn btn-secondary" id="backLearning">← Apprentissage</button>
   </div>
-
-  <div class="finger-training-card">
-    <div class="finger-keyboard" id="fingerKeyboard" aria-label="Clavier visuel AZERTY"></div>
-    <div class="finger-legend" aria-label="Légende des doigts">
-      <div class="finger-legend-item"><span class="finger-dot" style="background:#ff6b6b"></span>Auriculaires</div>
-      <div class="finger-legend-item"><span class="finger-dot" style="background:#f7b267"></span>Annulaires</div>
-      <div class="finger-legend-item"><span class="finger-dot" style="background:#7bdff2"></span>Majeurs</div>
-      <div class="finger-legend-item"><span class="finger-dot" style="background:#b8f2e6"></span>Index</div>
+  <div class="exercise">
+    <div class="progress"><div id="exerciseProgress"></div></div>
+    <div class="instruction" id="exerciseInstruction"></div>
+    <div class="keyboard" id="keyboard"></div>
+    <textarea id="learningInput" placeholder="Écris ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    <div class="stats">
+      <div class="stat"><span>Précision</span><strong id="learningAccuracy">0 %</strong></div>
+      <div class="stat"><span>Erreurs</span><strong id="learningErrors">0</strong></div>
+      <div class="stat"><span>Caractères corrects</span><strong id="learningCorrect">0</strong></div>
+      <div class="stat"><span>Objectif</span><strong id="learningGoal">90 %</strong></div>
     </div>
-
-    <div class="finger-levels" id="fingerLevels"></div>
-
-    <div id="fingerIdle">
-      <p class="finger-feedback">Choisis un exercice puis appuie sur <strong>Commencer</strong>. Le clavier te montrera la touche à utiliser.</p>
-      <div class="finger-actions"><button type="button" id="fingerStart" class="action-replay">▶ Commencer</button></div>
-    </div>
-
-    <div id="fingerActive" style="display:none">
-      <div class="finger-actions"><button type="button" id="fingerGiveTip" class="game-home">💡 Me rappeler le doigt</button></div>
-      <p id="fingerFeedback" class="finger-feedback" aria-live="polite">Appuie sur la touche indiquée.</p>
-      <div class="finger-progress"><span id="fingerProgress"></span></div>
-      <div class="training-progress-label"><span>Progression</span><strong id="fingerCounter">0 / 12</strong></div>
-    </div>
-
-    <div id="fingerFinish" style="display:none;text-align:center">
-      <h3 style="margin:8px 0 6px">🎉 Exercice terminé !</h3>
-      <p id="fingerFinishText" class="finger-feedback"></p>
-      <div class="finger-actions"><button type="button" id="fingerRestart" class="action-replay">↻ Recommencer</button></div>
+    <div class="actions" style="justify-content:space-between;margin-top:20px">
+      <button class="btn btn-secondary" id="helpButton">💡 Aide</button>
+      <button class="btn btn-primary" id="nextExercise" disabled>Continuer →</button>
     </div>
   </div>
 </section>
 
-
-<section class="panel" id="rowTrainingScreen" style="display:none" aria-label="Les rangées du clavier">
-  <div class="learning-module-bar">
-    <button type="button" id="rowHome" class="game-home">🧠 Apprentissage</button>
-    <span class="module-title">⌨️ Les rangées du clavier</span>
-    <button type="button" id="rowRestartTop" class="module-restart">↻ Recommencer</button>
+<section id="testScreen" class="screen">
+  <div class="section-head">
+    <div>
+      <h2>⚡ Test de rapidité</h2>
+      <p style="color:var(--muted)">Le test commence à ta première frappe et dure exactement 1 minute.</p>
+    </div>
+    <button class="btn btn-secondary" id="backHomeTest">Accueil</button>
   </div>
-  <div class="training-head"><div><div class="home-kicker">⌨️ PHASE 5</div><h2>Les rangées du clavier</h2><p>Maîtrise chaque rangée du clavier AZERTY.</p></div></div>
-  <div class="row-training-card">
-    <div class="row-training-top"><strong id="rowExerciseName">Ligne du haut</strong><span id="rowCounter">0 / 12</span></div>
-    <div class="row-target" id="rowTargetPreview">A Z E R T Y</div>
-    <div class="row-guidance" id="rowGuidance">Travaille la rangée supérieure du clavier.</div>
-    <div class="row-keyboard" id="rowKeyboard" aria-label="Clavier visuel AZERTY"></div>
-    <div class="row-levels" id="rowLevels"></div>
-    <button type="button" id="rowStart" class="action-replay">▶ Commencer</button>
-    <div id="rowActive" style="display:none"><strong>Appuie sur la touche indiquée</strong><div id="rowFeedback" aria-live="polite"></div><div class="row-progress"><span id="rowProgress"></span></div></div>
-    <div id="rowFinish" style="display:none"><h3>🎉 Rangée maîtrisée !</h3><p id="rowFinishText"></p><button type="button" id="rowRestart" class="action-replay">↻ Recommencer</button></div>
+  <div class="exercise">
+    <div class="instruction" id="testInstruction">Clique dans la zone puis commence à écrire. Le chronomètre démarrera automatiquement.</div>
+    <div class="stat" style="margin-bottom:18px;text-align:center">
+      <span>Temps restant</span>
+      <strong id="timeLeft">60 s</strong>
+    </div>
+    <p id="testText" style="font-size:1.2rem;line-height:1.8;background:#f7f8ff;border-radius:16px;padding:20px"></p>
+    <textarea id="typingInput" placeholder="Clique ici et commence à écrire..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    <div class="stats">
+      <div class="stat"><span>Vitesse</span><strong><span id="speed" style="display:inline;color:inherit;font-size:inherit">0.0</span> MPM</strong></div>
+      <div class="stat"><span>Vitesse nette</span><strong><span id="netSpeed" style="display:inline;color:inherit;font-size:inherit">0.0</span> MPM</strong></div>
+      <div class="stat"><span>Précision</span><strong><span id="accuracy" style="display:inline;color:inherit;font-size:inherit">0.0</span> %</strong></div>
+      <div class="stat"><span>Erreurs</span><strong id="errors">0</strong></div>
+    </div>
+  </div>
+</section>
+
+<section id="resultScreen" class="screen">
+  <div class="final">
+    <div style="font-size:4rem">🏆</div>
+    <h2>Test terminé !</h2>
+    <p style="color:var(--muted)">Voici tes résultats pour la minute.</p>
+    <div class="final-grid">
+      <div class="stat"><span>Vitesse</span><strong id="finalSpeed">0.0 MPM</strong></div>
+      <div class="stat"><span>Vitesse nette</span><strong id="finalNetSpeed">0.0 MPM</strong></div>
+      <div class="stat"><span>Précision</span><strong id="finalAccuracy">0.0 %</strong></div>
+      <div class="stat"><span>Erreurs</span><strong id="finalErrors">0</strong></div>
+    </div>
+    <div id="validation" class="validation">En attente</div>
+    <div class="actions">
+      <button class="btn btn-primary" id="resetButton">Recommencer</button>
+      <button class="btn btn-secondary" id="finalLearning">🧠 Apprentissage</button>
+      <button class="btn btn-secondary" id="finalHome">Accueil</button>
+    </div>
   </div>
 </section>
 </main>
-
-<script>
-/* Phase 2B : profil joueur + avatar */
-const PROFILE_KEY="typerush-profile";
-const avatarChoices=[
-  "🙂","😀","😃","😄","😁","😆","😅","😂","🤣","😊",
-  "😇","🥰","😍","🤩","😘","😎","🤓","🧐","🤠","🥳",
-  "😏","😤","😈","👿","🤡","🥷","🧑‍🚀","🧙","🧙‍♂️","🧝",
-  "🧛","🧟","👻","💀","👽","🤖","🐱","🐯","🦁","🐶",
-  "🦊","🐻","🐼","🐨","🐸","🐵","🦄","🐲","🦖","🐙",
-  "🦈","🦋","🐝","🌟","🔥","⚡","🌈","🐺","🦉","🐳"
-];
-const defaultProfile={name:"TypeRush",avatar:"😎"};
-let profile={...defaultProfile};
-function loadProfile(){
-  try{
-    const saved=JSON.parse(localStorage.getItem(PROFILE_KEY)||"null");
-    if(saved&&typeof saved==="object") profile={...defaultProfile,...saved};
-  }catch(e){profile={...defaultProfile};}
-  if(typeof profile.name!=="string"||!profile.name.trim()) profile.name=defaultProfile.name;
-  if(!avatarChoices.includes(profile.avatar)) profile.avatar=defaultProfile.avatar;
-}
-function saveProfile(){localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));}
-const $=id=>document.getElementById(id);
-
-function renderProfile(){
-  const homeAvatar=$("homeAvatar");
-  const homePlayerName=$("homePlayerName");
-  if(homeAvatar) homeAvatar.textContent=profile.avatar;
-  if(homePlayerName) homePlayerName.textContent=profile.name;
-  $("statsAvatar").textContent=profile.avatar;
-  $("statsPlayerName").textContent=profile.name;
-  $("playerName").value=profile.name;
-  const grid=$("avatarGrid");
-  grid.innerHTML="";
-  avatarChoices.forEach((avatar,i)=>{
-    const b=document.createElement("button");
-    b.type="button";b.className="avatar-btn";b.textContent=avatar;b.title="Avatar "+(i+1);
-    b.classList.toggle("active",avatar===profile.avatar);
-    b.onclick=()=>{profile.avatar=avatar;saveProfile();renderProfile();playSound("click");};
-    grid.appendChild(b);
-  });
-}
-function openProfile(){
-  hideWorkspaceSections();
-  $("profileEditor").style.display="block";
-  $("profileEditor").classList.add("show");
-  $("playerName").focus();
-}
-function closeProfile(){showHome();}
-const showProfileButton=$("showProfile");
-if(showProfileButton) showProfileButton.onclick=openProfile;
-const closeProfileButton=$("closeProfile");
-if(closeProfileButton) closeProfileButton.onclick=closeProfile;
-$("playerName").addEventListener("input",e=>{
-  const value=e.target.value.replace(/\s+/g," ").slice(0,20);
-  profile.name=value.trim()||defaultProfile.name;
-  saveProfile();
-  const homePlayerName=$("homePlayerName");
-  if(homePlayerName) homePlayerName.textContent=profile.name;
-  $("statsPlayerName").textContent=profile.name;
-});
-loadProfile();
-renderProfile();
-
-
-const texts={
- easy:[
-  "Le petit renard traverse la forêt pendant que le soleil se lève.",
-  "Aujourd'hui est une bonne journée pour apprendre quelque chose de nouveau.",
-  "La vitesse vient avec la pratique et la précision reste toujours importante.",
-  "Un clavier bien maîtrisé permet d'écrire plus vite et plus confortablement.",
-  "Le chat observe tranquillement les oiseaux depuis la fenêtre.",
-  "Une promenade au bord de la mer permet de profiter du calme et du vent.",
-  "Le soleil éclaire doucement les maisons au début de la matinée.",
-  "Chaque nouvelle tentative permet de progresser un peu plus.",
-  "Un bon rythme de frappe commence toujours par une bonne position des mains.",
-  "Les nuages avancent lentement au-dessus des montagnes.",
-  "Le jardin devient magnifique lorsque les fleurs commencent à s'ouvrir.",
-  "Une tasse de chocolat chaud réchauffe les mains pendant une soirée froide.",
-  "Le chien court dans le parc à la recherche de sa balle préférée.",
-  "Lire régulièrement permet de découvrir de nouvelles histoires et de nouveaux mots.",
-  "Le vent fait bouger les feuilles des arbres dans toute la rue.",
-  "Une bonne organisation permet de terminer les tâches plus facilement.",
-  "Le matin, les oiseaux chantent dans les arbres derrière la maison.",
-  "Il faut parfois prendre son temps pour apprendre correctement quelque chose.",
-  "Une idée simple peut devenir un grand projet avec beaucoup de travail.",
-  "Le clavier devient plus facile à utiliser lorsque les doigts connaissent leur chemin.",
-  "Lorsque la pluie commence à tomber, les rues deviennent brillantes sous les lumières de la ville.",
-  "Pour progresser rapidement, il faut garder un rythme régulier sans chercher uniquement à battre son record.",
-  "Les nouvelles technologies permettent de créer des projets intéressants avec quelques lignes de code.",
-  "La concentration, la mémoire musculaire et la précision sont essentielles pour améliorer sa frappe.",
-  "Un ordinateur rapide est pratique, mais une bonne méthode de travail est encore plus importante.",
-  "Chaque seconde compte lorsque deux joueurs essaient de battre leur meilleur score.",
-  "Le développement d'un logiciel demande souvent plusieurs essais avant d'obtenir le résultat souhaité.",
-  "Une erreur dans un programme peut parfois devenir une occasion intéressante d'apprendre.",
-  "Les jeux vidéo modernes utilisent de nombreuses technologies pour créer des mondes impressionnants.",
-  "Un objectif clair permet de rester motivé même lorsque l'exercice devient difficile.",
-  "Le meilleur moyen de progresser est de pratiquer régulièrement pendant quelques minutes chaque jour.",
-  "Une équipe efficace communique clairement et partage ses idées avec les autres.",
-  "Les montagnes paraissent immenses lorsque l'on observe leur sommet depuis la vallée.",
-  "Un bon joueur sait quand prendre des risques et quand rester prudent."
- ],
- medium:[
-  "Les livres permettent de voyager très loin sans avoir besoin de quitter sa chambre.",
-  "Un projet réussi commence souvent par une petite idée qui évolue avec le temps.",
-  "La musique peut aider certaines personnes à rester concentrées pendant leur travail.",
-  "Une bonne connexion internet rend les activités en ligne beaucoup plus agréables.",
-  "Le ciel change rapidement de couleur lorsque le soleil disparaît derrière l'horizon.",
-  "Apprendre à taper sans regarder le clavier demande de la patience et de la répétition.",
-  "Le train arrive en gare tandis que les voyageurs se préparent à monter.",
-  "Une carte bien détaillée permet de retrouver facilement son chemin dans une grande ville.",
-  "Les développeurs testent leurs applications afin de détecter les problèmes avant leur publication.",
-  "Une petite amélioration répétée chaque jour peut produire un résultat impressionnant après plusieurs mois.",
-  "Le courage ne signifie pas ne jamais avoir peur, mais continuer malgré les difficultés.",
-  "Un bon entraînement permet d'améliorer progressivement la vitesse et la précision.",
-  "Les étoiles deviennent visibles lorsque la nuit est suffisamment sombre.",
-  "Un navigateur internet permet d'accéder rapidement à des milliers de sites différents.",
-  "Les océans couvrent une grande partie de notre planète et abritent de nombreuses espèces.",
-  "Créer quelque chose soi-même donne souvent une grande satisfaction lorsque le projet fonctionne enfin.",
-  "Une bonne mémoire musculaire permet aux doigts de bouger presque automatiquement.",
-  "Les couleurs du coucher de soleil changent selon les nuages et la lumière.",
-  "Il est important de vérifier son travail avant de considérer une tâche comme terminée.",
-  "Les robots peuvent effectuer certaines tâches répétitives avec une grande précision.",
-  "Une journée bien organisée laisse davantage de temps pour les activités que l'on apprécie.",
-  "Le bruit de la pluie contre les fenêtres peut rendre une soirée particulièrement agréable.",
-  "Un problème compliqué devient souvent plus simple lorsqu'il est divisé en plusieurs petites étapes.",
-  "Les ordinateurs modernes peuvent effectuer des millions de calculs en très peu de temps.",
-  "Une bonne question peut parfois conduire à une découverte complètement inattendue.",
-  "Les jeux de stratégie demandent souvent de réfléchir plusieurs coups à l'avance.",
-  "Le printemps transforme progressivement les paysages avec de nouvelles couleurs.",
-  "Une équipe soudée peut réussir des projets qui semblaient impossibles au départ.",
-  "Le vent souffle doucement tandis que les vagues arrivent sur la plage.",
-  "Apprendre une nouvelle compétence demande du temps, mais chaque progrès compte.",
-  "Les informations trouvées sur internet doivent parfois être vérifiées avant d'être utilisées.",
-  "Un espace de travail bien rangé permet de mieux se concentrer sur les tâches importantes.",
-  "Les grandes inventions commencent souvent par une observation très simple."
- ],
- hard:[
-  "Une randonnée en montagne permet de découvrir des paysages difficiles à voir depuis la ville.",
-  "Le café du matin donne à certaines personnes l'énergie nécessaire pour commencer leur journée.",
-  "Les étoiles semblent immobiles, même si notre planète se déplace constamment dans l'espace.",
-  "Un bon entraînement doit être suffisamment difficile pour faire progresser sans décourager.",
-  "Les jeux rapides demandent de bonnes réactions et une excellente concentration.",
-  "Une sauvegarde régulière permet d'éviter de perdre plusieurs heures de travail.",
-  "Les mots deviennent plus faciles à taper lorsque l'on arrête de chercher chaque lettre.",
-  "Un objectif précis permet de mesurer facilement les progrès réalisés au fil du temps.",
-  "Les animaux utilisent de nombreuses façons différentes pour communiquer entre eux.",
-  "Une ville devient particulièrement animée lorsque les rues commencent à se remplir le matin.",
-  "Le silence d'une forêt peut être impressionnant après plusieurs heures passées dans une ville.",
-  "Un bon logiciel doit être rapide, fiable et simple à utiliser.",
-  "Les nouvelles idées apparaissent parfois lorsque l'on prend une pause pour réfléchir.",
-  "Une bonne préparation rend les tâches difficiles beaucoup moins stressantes.",
-  "Le soleil se reflète sur l'eau et crée de petits éclats lumineux.",
-  "Les ordinateurs sont devenus indispensables dans de nombreux métiers modernes.",
-  "Un exercice régulier permet d'améliorer la coordination entre les yeux et les mains.",
-  "Les explorateurs doivent souvent préparer leur équipement avant de partir vers une région inconnue.",
-  "Une histoire captivante peut faire oublier complètement le temps qui passe.",
-  "Les montagnes enneigées offrent un spectacle impressionnant pendant les journées ensoleillées.",
-  "Une bonne stratégie consiste à observer la situation avant de prendre une décision.",
-  "Les jeux multijoueurs demandent autant de communication que de rapidité.",
-  "Une connexion stable est importante lorsqu'on participe à une partie en ligne.",
-  "Le bruit des vagues accompagne les promeneurs qui marchent près du rivage.",
-  "Les développeurs corrigent régulièrement les erreurs afin d'améliorer leurs applications.",
-  "Une compétence devient plus naturelle lorsque l'on la pratique suffisamment longtemps.",
-  "Le clavier permet de transformer rapidement les idées en texte.",
-  "Une bonne précision est souvent plus utile qu'une vitesse excessive.",
-  "Les petits objectifs sont plus faciles à atteindre lorsqu'ils sont organisés dans un ordre logique.",
-  "Un nouveau projet peut sembler compliqué avant d'avoir été découpé en plusieurs étapes.",
-  "Les connaissances s'accumulent progressivement lorsque l'on apprend un peu chaque jour.",
-  "Le monde numérique évolue rapidement et crée régulièrement de nouvelles possibilités.",
-  "Une bonne concentration permet de remarquer des détails que l'on aurait facilement ignorés.",
-  "Le meilleur score n'est pas toujours le plus important, car la régularité compte aussi.",
-  "Chaque erreur corrigée permet de mieux comprendre la façon dont on peut progresser.",
-  "Une longue journée paraît plus courte lorsque l'on passe du temps à faire quelque chose que l'on aime.",
-  "Les idées les plus simples peuvent parfois produire les résultats les plus efficaces.",
-  "Un bon entraînement commence par des exercices faciles avant de passer à des défis plus difficiles.",
-  "Les progrès sont souvent plus visibles lorsque l'on compare ses résultats après plusieurs semaines.",
-  "Une phrase correctement tapée vaut mieux qu'une phrase rapide remplie d'erreurs."
- ]
-};
-
-let difficulty="easy", target="", started=false, finished=false, startTime=0, timer=null;
-let duration=30;
-let combo=0,bestCombo=0,lastTypedValue="";
-const BEST_COMBO_KEY="typerush-best-combo";
-let remainingTexts=[];
-let totalCorrect=0, totalTyped=0, totalErrors=0, completedPhrases=0;
-const HISTORY_KEY="typerush-history";
-const MAX_HISTORY=500;
-const input=$("input");
-
-function refillPhrasePool(){
- remainingTexts=[...texts[difficulty]];
- // Mélange Fisher-Yates : chaque phrase n'est tirée qu'une fois par partie.
- for(let i=remainingTexts.length-1;i>0;i--){
-   const j=Math.floor(Math.random()*(i+1));
-   [remainingTexts[i],remainingTexts[j]]=[remainingTexts[j],remainingTexts[i]];
- }
-}
-function randomText(){
- if(remainingTexts.length===0) refillPhrasePool();
- return remainingTexts.pop();
-}
-function render(){
- $("text").innerHTML="";
- [...target].forEach((c,i)=>{
-   const s=document.createElement("span");
-   s.className="char"+(i===0?" current":"");
-   s.textContent=c;
-   $("text").appendChild(s);
- });
-}
-function getDuration(){
- const value=$("timerSelect").value;
- if(value==="custom"){
-   const n=Number($("customTime").value);
-   return Math.min(600,Math.max(5,Number.isFinite(n)?Math.round(n):30));
- }
- return Number(value);
-}
-$("timerSelect").addEventListener("change",()=>{
- const custom=$("timerSelect").value==="custom";
- $("customTime").hidden=!custom;
- if(custom) $("customTime").focus();
- duration=getDuration();
- reset();
-});
-$("customTime").addEventListener("change",()=>{
- duration=getDuration();
- $("customTime").value=duration;
- reset();
-});
-
-function loadHistory(){
- try{
-   const data=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]");
-   return Array.isArray(data)?data:[];
- }catch(e){return [];}
-}
-function saveHistory(history){
- localStorage.setItem(HISTORY_KEY,JSON.stringify(history.slice(-MAX_HISTORY)));
-}
-function getSavedBestCombo(){
- const value=Number(localStorage.getItem(BEST_COMBO_KEY)||0);
- return Number.isFinite(value)?Math.max(0,value):0;
-}
-function saveBestCombo(value){
- const current=getSavedBestCombo();
- if(value>current)localStorage.setItem(BEST_COMBO_KEY,String(value));
-}
-function formatDuration(seconds){
- const total=Math.max(0,Math.round(seconds));
- const h=Math.floor(total/3600),m=Math.floor((total%3600)/60),s=total%60;
- if(h>0)return `${h} h ${m} min ${s} s`;
- if(m>0)return `${m} min ${String(s).padStart(2,"0")} s`;
- return `${s} s`;
-}
-function formatShortDuration(seconds){
- const total=Math.max(0,Math.round(seconds));
- const m=Math.floor(total/60),s=total%60;
- return m>0?`${m} min ${String(s).padStart(2,"0")} s`:`${s} s`;
-}
-function difficultyLabel(value){
- return value==="easy"?"Facile":value==="medium"?"Moyen":"Difficile";
-}
-function recordGame(){
- const now=new Date();
- const history=loadHistory();
- history.push({
-   id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),
-   date:now.toISOString().slice(0,10),
-   time:now.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",second:"2-digit"}),
-   difficulty, duration:Math.round(elapsedForRecord),
-   wpm:rawWpm, accuracy:rawAccuracy, errors:finalErrorsForRecord,
-   typedCharacters:finalTypedForRecord, correctCharacters:finalCorrectForRecord,
-   incorrectCharacters:finalErrorsForRecord, completedPhrases, bestCombo
- });
- saveHistory(history);
-}
-function renderStatistics(){
- const history=loadHistory();
- const games=history.length;
- const correct=history.reduce((n,g)=>n+(Number(g.correctCharacters)||0),0);
- const typed=history.reduce((n,g)=>n+(Number(g.typedCharacters)||0),0);
- const errors=history.reduce((n,g)=>n+(Number(g.errors)||0),0);
- const seconds=history.reduce((n,g)=>n+(Number(g.duration)||0),0);
- const bestWpm=games?Math.max(...history.map(g=>Number(g.wpm)||0)):0;
- const bestAcc=games?Math.max(...history.map(g=>Number(g.accuracy)||0)):0;
- const historyBestCombo=games?Math.max(...history.map(g=>Number(g.bestCombo)||0)):0;
- const bestComboOverall=Math.max(historyBestCombo,getSavedBestCombo());
- const avgWpm=seconds>0?((correct/5)/(seconds/60)):0;
- const avgAcc=typed?correct/typed*100:0;
- $("statGames").textContent=games;
- $("statBestWpm").textContent=Math.round(bestWpm);
- $("statBestCombo").textContent=bestComboOverall;
- $("statAvgWpm").textContent=Math.round(avgWpm);
- $("statBestAccuracy").textContent=Math.round(bestAcc)+"%";
- $("statAvgAccuracy").textContent=Math.round(avgAcc)+"%";
- $("statTyped").textContent=typed.toLocaleString("fr-FR");
- $("statCorrect").textContent=correct.toLocaleString("fr-FR");
- $("statErrors").textContent=errors.toLocaleString("fr-FR");
- $("statTime").textContent=formatDuration(seconds);
- $("historyCount").textContent=games;
- $("historyBest").textContent=Math.round(bestWpm)+" WPM";
- $("historyErrors").textContent=errors.toLocaleString("fr-FR");
- $("historyTime").textContent=formatDuration(seconds);
- const chart=$("wpmChart");
- if(!history.length){chart.innerHTML='<div class="empty-history">Joue quelques parties pour voir ton évolution.</div>';}
- else{
-   const recent=history.slice(-30), max=Math.max(...recent.map(g=>Number(g.wpm)||0),1);
-   chart.innerHTML="";
-   recent.forEach((g,i)=>{
-     const bar=document.createElement("div"); bar.className="chart-bar";
-     bar.style.height=Math.max(3,(Number(g.wpm)||0)/max*145)+"px";
-     bar.title=`Partie ${history.length-recent.length+i+1} : ${Math.round(Number(g.wpm)||0)} WPM`;
-     const label=document.createElement("span"); label.textContent=Math.round(Number(g.wpm)||0); bar.appendChild(label); chart.appendChild(bar);
-   });
- }
- const list=$("historyList");
- if(!history.length){list.innerHTML='<div class="empty-history">Aucune partie enregistrée pour le moment.</div>';return;}
- list.innerHTML="";
- [...history].reverse().forEach(g=>{
-   const item=document.createElement("div"); item.className="history-item";
-   item.innerHTML=`<div class="history-date">${g.date.split("-").reverse().join("/")}<small>${g.time||""}</small></div>
-     <div><span class="difficulty-badge">${difficultyLabel(g.difficulty)}</span></div>
-     <div class="history-value"><b>${Math.round(Number(g.wpm)||0)} WPM</b><span>Vitesse</span></div>
-     <div class="history-value"><b>${Math.round(Number(g.accuracy)||0)}%</b><span>Précision</span></div>
-     <div class="history-value"><b>${Number(g.errors)||0}</b><span>Erreurs · ${formatShortDuration(g.duration)}</span></div>
-     <div class="history-value"><b>🔥 ${Number(g.bestCombo)||0}</b><span>Meilleur combo</span></div>`;
-   list.appendChild(item);
- });
-}
-function hideWorkspaceSections(){
- ["homeScreen","learningHub","trainingScreen","rowTrainingScreen","statistics","customize","profileEditor","result"].forEach(id=>{
-   const el=$(id);
-   if(el){ el.classList.remove("show"); el.style.display="none"; }
- });
- $("game").style.display="none";
- $("workspace").style.display="block";
-}
-function renderHomeSummary(){
- const history=loadHistory();
- const games=history.length;
- const correct=history.reduce((n,g)=>n+(Number(g.correctCharacters)||0),0);
- const typed=history.reduce((n,g)=>n+(Number(g.typedCharacters)||0),0);
- const bestWpm=games?Math.max(...history.map(g=>Number(g.wpm)||0)):0;
- const bestCombo=games?Math.max(...history.map(g=>Number(g.bestCombo)||0)):0;
- const avgAcc=typed?correct/typed*100:100;
- $("homeBestWpm").textContent=Math.round(bestWpm);
- $("homeBestCombo").textContent=Math.max(bestCombo,getSavedBestCombo());
- $("homeAvgAccuracy").textContent=Math.round(avgAcc)+"%";
- $("homeGames").textContent=games;
-}
-function showHome(){
- clearInterval(timer);
- started=false;
- finished=false;
- input.disabled=true;
- hideWorkspaceSections();
- $("workspace").style.display="none";
- $("homeScreen").style.display="block";
- $("homeScreen").classList.add("show");
- renderHomeSummary();
- window.scrollTo({top:0,behavior:settings.animations?"smooth":"auto"});
-}
-function showStatistics(){
- hideWorkspaceSections();
- $("statistics").style.display="block";
- $("statistics").classList.add("show");
- renderStatistics();
-}
-function showGame(){
- hideWorkspaceSections();
- if(finished){
-   $("game").style.display="none";
-   $("result").classList.add("show");
- }else{
-   $("game").style.display="block";
-   $("result").classList.remove("show");
-   $("input").disabled=false;
-   $("input").focus();
- }
-}
-
-function reset(){
- duration=getDuration();
- clearInterval(timer); started=false;finished=false;startTime=0;
- // Une nouvelle partie recommence un nouveau cycle sans répétition.
- refillPhrasePool();
- target=randomText(); input.value=""; input.disabled=false; input.focus();
- totalCorrect=0; totalTyped=0; totalErrors=0; completedPhrases=0;
- combo=0;bestCombo=0;lastTypedValue="";updateComboUI();
- $("comboBestCount").textContent=getSavedBestCombo();
- $("time").textContent=duration;$("wpm").textContent=0;$("accuracy").textContent="100%";$("errors").textContent=0;
- $("bar").style.width="0%";$("homeScreen").classList.remove("show");$("workspace").style.display="block";$("game").style.display="block";$("statistics").classList.remove("show");$("customize").classList.remove("show");$("profileEditor").classList.remove("show");$("result").classList.remove("show");render();
-}
-function updateComboUI(message){
- const badge=$("comboBadge"),count=$("comboCount"),msg=$("comboMessage");
- if(!badge||!count||!msg)return;
- count.textContent=combo;
- const savedBest=getSavedBestCombo();
- $("comboBestCount").textContent=Math.max(savedBest,bestCombo);
- badge.classList.toggle("hot",combo>=10);
- badge.classList.toggle("fire",combo>=20);
- if(message!==undefined)msg.textContent=message;
- else if(combo===0)msg.textContent="Commence à taper pour lancer ta série !";
- else if(combo<5)msg.textContent="Bonne série !";
- else if(combo<10)msg.textContent="🔥 Ça chauffe !";
- else if(combo<20)msg.textContent="⚡ Série impressionnante !";
- else msg.textContent="💥 Série en feu !";
-}
-function registerComboCharacter(char,index){
- const game=$("game");
- if(char===target[index]){
-   combo++;
-   bestCombo=Math.max(bestCombo,combo);
-   updateComboUI();
-   game.classList.remove("combo-break");
-   game.classList.add(combo>=10?"combo-hot":"combo-hit");
-   setTimeout(()=>game.classList.remove("combo-hit","combo-hot"),130);
-   const badge=$("comboBadge");
-   if(badge){badge.classList.remove("combo-pop");void badge.offsetWidth;badge.classList.add("combo-pop");}
-   if(combo===5||combo===10||combo===20||combo===30||combo===50){
-     playSound("combo");
-     if(settings.animations && settings.animationStyle==="new") triggerComboMilestone(combo);
-     else if(settings.animations) updateComboUI("🔥 Palier x"+combo+" !");
-   }
- }else{
-   if(combo>=5)updateComboUI("💔 Série interrompue !");
-   combo=0;updateComboUI("💔 Série interrompue !");
-   game.classList.remove("combo-hit","combo-hot");
-   game.classList.remove("combo-break");void game.offsetWidth;game.classList.add("combo-break");
-   setTimeout(()=>game.classList.remove("combo-break"),250);
- }
-}
-
-function triggerComboMilestone(level){
- const overlay=$("comboMilestone"),icon=$("comboMilestoneIcon"),text=$("comboMilestoneText"),sub=$("comboMilestoneSub");
- if(!overlay||!icon||!text||!sub)return;
- const data={
-   5:{icon:"🔥",text:"COMBO x5",sub:"Bonne série !",cls:"m5"},
-   10:{icon:"⚡",text:"COMBO x10",sub:"Ça accélère !",cls:"m10"},
-   20:{icon:"💥",text:"COMBO x20",sub:"Série en feu !",cls:"m20"},
-   30:{icon:"🌪️",text:"COMBO x30",sub:"Impressionnant !",cls:"m30"},
-   50:{icon:"👑",text:"COMBO x50",sub:"LÉGENDAIRE !",cls:"m50"}
- }[level];
- if(!data)return;
- overlay.className="combo-milestone show "+data.cls;
- overlay.setAttribute("aria-hidden","false");
- icon.textContent=data.icon;text.textContent=data.text;sub.textContent=data.sub;
- const game=$("game");
- if(game){
-   game.classList.remove("milestone-5","milestone-10","milestone-20","milestone-30","milestone-50");
-   void game.offsetWidth;
-   game.classList.add("milestone-"+level);
-   setTimeout(()=>game.classList.remove("milestone-"+level),1000);
- }
- clearTimeout(triggerComboMilestone.timer);
- triggerComboMilestone.timer=setTimeout(()=>{
-   overlay.className="combo-milestone";
-   overlay.setAttribute("aria-hidden","true");
- },1300);
-}
-
-function calculateMetrics(correctCharacters, typedCharacters, elapsedSeconds){
- const correct=Math.max(0,Number(correctCharacters)||0);
- const typed=Math.max(0,Number(typedCharacters)||0);
- const elapsed=Math.max(0.001,Number(elapsedSeconds)||0.001);
- const errors=Math.max(0,typed-correct);
- const accuracy=typed>0?(correct/typed)*100:100;
- const wpm=(correct/5)/(elapsed/60);
- return {correct,typed,errors,elapsed,accuracy,wpm};
-}
-
-function update(){
- const typed=input.value;
- let correct=0;
- [...target].forEach((c,i)=>{
-   const el=$("text").children[i];
-   if(!el)return;
-   el.className="char";
-   if(i<typed.length) el.classList.add(typed[i]===c?"correct":"wrong");
-   if(typed[i]===c) correct++;
- });
- if($("text").children[typed.length]) $("text").children[typed.length].classList.add("current");
-
- const elapsed=Math.max(0.001,(Date.now()-startTime)/1000);
- const currentErrors=Math.max(0,typed.length-correct);
- const liveCorrect=totalCorrect+correct;
- const liveTyped=totalTyped+typed.length;
- const live=calculateMetrics(liveCorrect,liveTyped,elapsed);
-
- $("wpm").textContent=Math.round(live.wpm);
- $("accuracy").textContent=Math.round(live.accuracy)+"%";
- $("errors").textContent=live.errors;
- $("bar").style.width=target.length?Math.min(100,typed.length/target.length*100)+"%":"0%";
-
- if(typed.length>=target.length){
-   totalCorrect+=correct;
-   totalTyped+=target.length;
-   totalErrors+=currentErrors;
-   completedPhrases++;
-   if((Date.now()-startTime)/1000 < duration) nextPhrase();
-   else finish();
- }
-}
-function nextPhrase(){
- if(finished)return;
- target=randomText();
- input.value="";
- lastTypedValue="";
- render();
- input.focus();
-}
-function start(){
- if(started)return;
- started=true;startTime=Date.now();
- timer=setInterval(()=>{
-   const left=Math.max(0,duration-Math.floor((Date.now()-startTime)/1000));
-   $("time").textContent=left;
-   if(left<=0) finish();
- },100);
-}
-function finish(){
- if(finished)return;
- finished=true; clearInterval(timer); input.disabled=true;
- playSound("finish");
- const typed=input.value;
- // Une phrase déjà validée dans update() ne doit pas être comptée une seconde fois.
- const phraseAlreadyCommitted=typed.length>=target.length;
- const currentTyped=phraseAlreadyCommitted?0:typed.length;
- const currentCorrect=phraseAlreadyCommitted?0:[...typed].filter((c,i)=>c===target[i]).length;
- const currentErrors=Math.max(0,currentTyped-currentCorrect);
- const finalCorrect=totalCorrect+currentCorrect;
- const finalTyped=totalTyped+currentTyped;
- const finalErrors=totalErrors+currentErrors;
- const elapsed=Math.min(duration,Math.max(0.001,(Date.now()-startTime)/1000));
- const metrics=calculateMetrics(finalCorrect,finalTyped,elapsed);
- const rawAccuracy=metrics.accuracy;
- const rawWpm=metrics.wpm;
- const accuracy=Math.round(metrics.accuracy);
- const wpm=Math.round(metrics.wpm);
- // Score final = WPM final. Les deux affichages utilisent exactement
- // le même résultat arrondi : aucune incohérence possible.
- const score=wpm;
- window.elapsedForRecord=metrics.elapsed; window.rawWpm=metrics.wpm; window.rawAccuracy=metrics.accuracy;
- window.finalErrorsForRecord=finalErrors; window.finalTypedForRecord=finalTyped; window.finalCorrectForRecord=finalCorrect;
- saveBestCombo(bestCombo);
- recordGame();
- $("finalScore").textContent=score;
- $("finalScoreSmall").textContent=score;
- $("finalWpm").textContent=wpm;
- $("finalAccuracy").textContent=accuracy+"%";
- $("finalComboValue").textContent=bestCombo;
- $("finalErrors").textContent=finalErrors+" erreur"+(finalErrors>1?"s":"");
- $("finalTime").textContent=formatShortDuration(elapsed);
- const key="typerush-best-"+difficulty,best=Number(localStorage.getItem(key)||0);
- if(rawWpm>best){localStorage.setItem(key,rawWpm);$("best").textContent="🏆 Nouveau record ! — Meilleur WPM : "+wpm;$("best").className="record-message new-record";}
- else {$("best").textContent="🏆 Ton meilleur WPM : "+Math.round(best);$("best").className="record-message old-record";}
- $("game").style.display="none";
- $("statistics").classList.remove("show");
- $("result").classList.add("show");
-}
-$("gameHome").onclick=showHome;
-$("newGame").onclick=()=>{showGame();reset();};
-$("again").onclick=()=>{showGame();reset();};
-$("homeResult").onclick=showHome;
-$("homePlay").onclick=()=>{ showGame(); reset(); };
-$("homeStats").onclick=showStatistics;
-$("homeCustomize").onclick=openCustomize;
-$("homeProfile").onclick=openProfile;
-$("showStats").onclick=showStatistics;
-$("backToGame").onclick=showHome;
-$("clearHistory").onclick=()=>{
- if(confirm("⚠️ Effacer tout l’historique de TypeRush ?\n\nCette action est irréversible.")){
-   localStorage.removeItem(HISTORY_KEY); localStorage.removeItem(BEST_COMBO_KEY); renderStatistics();
- }
-};
-input.addEventListener("input",()=>{
- if(!started) start();
- const typed=input.value;
- if(typed.length<lastTypedValue.length || !typed.startsWith(lastTypedValue)){
-   combo=0;updateComboUI("↩️ Série réinitialisée");
-   if(typed.length<lastTypedValue.length) playSound("wrong");
-   lastTypedValue=typed;
- }else if(typed.length>lastTypedValue.length){
-   for(let i=lastTypedValue.length;i<typed.length;i++){
-     const index=i;
-     const correct=typed[i]===target[index];
-     playSound(correct?"correct":"wrong");
-     registerComboCharacter(typed[i],index);
-   }
-   lastTypedValue=typed;
- }
- update();
-});
-
-document.querySelectorAll(".diff").forEach(btn=>btn.onclick=()=>{
- document.querySelectorAll(".diff").forEach(b=>b.classList.remove("active"));
- btn.classList.add("active");difficulty=btn.dataset.diff;reset();
-});
-
-/* Phase 2A : personnalisation */
-const SETTINGS_KEY="typerush-settings";
-const defaultSettings={background:"dark",theme:"obsidian",accent:"#7c5cff",textSize:"normal",font:"modern",animations:true,animationStyle:"new",sounds:true,volume:35};
-let settings={...defaultSettings};
-let audioContext=null;
-function loadSettings(){
- try{const saved=JSON.parse(localStorage.getItem(SETTINGS_KEY)||"null");if(saved&&typeof saved==="object")settings={...defaultSettings,...saved};}
- catch(e){settings={...defaultSettings};}
- if(settings.animationStyle!=="classic" && settings.animationStyle!=="new") settings.animationStyle="new";
-}
-function saveSettings(){localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}
-function applySettings(){
- if(!["dark","light","default","aurora","grid","sunset","midnight","minimal","runeterra","nightcity","horror","racing","elden","metro","overwatch","space"].includes(settings.background)){settings.background="dark";}
- if(!["obsidian","violet","cyber","ocean","forest","inferno"].includes(settings.theme)){settings.theme="obsidian";}
- document.body.classList.remove("theme-obsidian","theme-violet","theme-cyber","theme-ocean","theme-forest","theme-inferno","theme-light","theme-light-warm");
- document.body.classList.add("theme-"+settings.theme);
- document.body.classList.remove("bg-dark","bg-light","bg-default","bg-aurora","bg-grid","bg-sunset","bg-midnight","bg-minimal","bg-runeterra","bg-nightcity","bg-horror","bg-racing","bg-elden","bg-metro","bg-overwatch","bg-space");
- document.body.classList.add("bg-"+(settings.background||"dark"));
- document.body.style.setProperty("--accent",settings.accent);
- document.body.classList.remove("font-modern","font-mono","font-cyber","font-classic");
- document.body.classList.add("font-"+settings.font);
- document.body.classList.toggle("no-animations",!settings.animations);
- $("accentColor").value=settings.accent;$('backgroundChoice').value=settings.background;$('textSize').value=settings.textSize;$('fontChoice').value=settings.font;$('animationStyle').value=settings.animationStyle;
- $("animationsToggle").checked=settings.animations;$("soundsToggle").checked=settings.sounds;$("volumeControl").value=settings.volume;
- document.querySelectorAll(".theme-btn").forEach(b=>b.classList.toggle("active",b.dataset.theme===settings.theme));
- $("text").classList.remove("text-small","text-normal","text-large");$("text").classList.add("text-"+settings.textSize);
-}
-function playSound(type){
- if(!settings.sounds||settings.volume<=0)return;
- try{
-  audioContext=audioContext||new(window.AudioContext||window.webkitAudioContext)();
-  if(audioContext.state==="suspended")audioContext.resume();
-  const osc=audioContext.createOscillator(),gain=audioContext.createGain(),now=audioContext.currentTime;
-  const volume=(settings.volume/100)*0.045,freq=type==="correct"?620:type==="wrong"?170:type==="finish"?880:type==="combo"?980:440;
-  osc.type=type==="wrong"?"sawtooth":"sine";osc.frequency.setValueAtTime(freq,now);
-  if(type==="combo")osc.frequency.exponentialRampToValueAtTime(1320,now+.14);
-  if(type==="finish")osc.frequency.exponentialRampToValueAtTime(1180,now+.16);
-  gain.gain.setValueAtTime(volume,now);gain.gain.exponentialRampToValueAtTime(.0001,now+(type==="finish"?.2:type==="combo"?.16:.055));
-  osc.connect(gain);gain.connect(audioContext.destination);osc.start(now);osc.stop(now+(type==="finish"?.21:type==="combo"?.17:.06));
- }catch(e){}
-}
-function openCustomize(){
- hideWorkspaceSections();
- $("customize").style.display="block";
- $("customize").classList.add("show");
-}
-function closeCustomize(){showHome();}
-$("showCustomize").onclick=openCustomize;$("closeCustomize").onclick=closeCustomize;
-document.querySelectorAll(".theme-btn").forEach(btn=>btn.addEventListener("click",()=>{
-  settings.theme=btn.dataset.theme;saveSettings();applySettings();playSound("click");
-}));
-$("backgroundChoice").addEventListener("change",e=>{settings.background=e.target.value;saveSettings();applySettings();playSound("click");});
-$("accentColor").addEventListener("input",e=>{settings.accent=e.target.value;saveSettings();applySettings();});
-$("textSize").addEventListener("change",e=>{settings.textSize=e.target.value;saveSettings();applySettings();});
-$("fontChoice").addEventListener("change",e=>{settings.font=e.target.value;saveSettings();applySettings();});
-$("animationStyle").addEventListener("change",e=>{settings.animationStyle=e.target.value==="classic"?"classic":"new";saveSettings();applySettings();});
-$("animationsToggle").addEventListener("change",e=>{settings.animations=e.target.checked;saveSettings();applySettings();});
-$("soundsToggle").addEventListener("change",e=>{settings.sounds=e.target.checked;saveSettings();if(settings.sounds)playSound("click");});
-$("volumeControl").addEventListener("input",e=>{settings.volume=Number(e.target.value);saveSettings();});
-loadSettings();applySettings();
-renderHomeSummary();
-
-// Au chargement, TypeRush arrive toujours sur le véritable accueil.
-// Aucune partie n'est lancée et le chrono ne démarre pas.
-showHome();
-
-(function(){const K="typerush-training-errors-v1",P="azertyuiopqsdfghjklmwxcvbn".split(""),$=id=>document.getElementById(id);let E=JSON.parse(localStorage.getItem(K)||"{}"),target="",started=false,n=0,typed=0,correct=0,errs=0,combo=0,best=0,total=10;function save(){localStorage.setItem(K,JSON.stringify(E))}function rank(){return P.map(k=>({k,c:+E[k]||0})).sort((a,b)=>b.c-a.c||a.k.localeCompare(b.k))}function focus(){let a=rank().filter(x=>x.c>0).slice(0,4).map(x=>x.k);return a.length?a:["a","e","r","t"]}function esc(x){return String(x).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}function exercise(){let f=focus(),s="";for(let i=0;i<18;i++)s+=f[Math.floor(Math.random()*f.length)]+(i<17?" ":"");return s}function stats(){let a=typed?Math.round(correct/typed*100):100;$("trainingAccuracy").textContent=a+"%";$("trainingErrors").textContent=errs;$("trainingBestCombo").textContent=best;$("trainingSessions").textContent=localStorage.getItem("typerush-training-sessions-v1")||0;let r=rank().filter(x=>x.c>0);$("trainingWeakKeys").innerHTML=r.slice(0,8).map(x=>`<div class="training-key-chip"><strong>${x.k.toUpperCase()}</strong><small>${x.c} erreur${x.c>1?"s":""}</small></div>`).join("");$("trainingNoErrors").style.display=r.length?"none":"block";$("trainingKeyTable").innerHTML=rank().map(x=>`<div class="training-key-row"><strong>${x.k.toUpperCase()}</strong><span>${x.c} erreur${x.c>1?"s":""}</span></div>`).join("")}function render(){let v=$("trainingInput").value||"";$("trainingPrompt").innerHTML=[...target].map((c,i)=>`<span class="${i<v.length?(v[i]===c?"correct":"wrong"):(i===v.length?"current":"")}">${esc(c)}</span>`).join("");$("trainingTargetKey").textContent=(target[v.length]||"✓").toUpperCase();$("trainingProgressText").textContent=Math.min(v.length,target.length)+" / "+target.length;$("trainingProgressBar").style.width=Math.min(100,v.length/target.length*100)+"%"}function start(){n=0;typed=0;correct=0;errs=0;combo=0;best=0;started=true;target=exercise();$("trainingInput").disabled=false;$("trainingInput").value="";$("trainingLevel").textContent=rank().some(x=>x.c>10)?"Niveau 2":"Niveau 1";render();stats();$("trainingInput").focus()}function next(){if(++n>=total){started=false;$("trainingInput").disabled=true;let key="typerush-training-sessions-v1";localStorage.setItem(key,String((+localStorage.getItem(key)||0)+1));$("trainingFeedback").textContent="Session terminée ! Tu peux recommencer pour continuer à cibler tes erreurs.";stats();return}target=exercise();$("trainingInput").value="";render()}if($("trainingInput"))$("trainingInput").addEventListener("input",()=>{if(!started)return;let v=$("trainingInput").value,i=v.length-1;if(i>=0){typed++;if(v[i]===target[i]){correct++;combo++;best=Math.max(best,combo);$("trainingFeedback").textContent=combo>=5?`🔥 Combo x${combo} !`:"Correct !"}else{errs++;combo=0;let k=(target[i]||v[i]||"").toLowerCase();if(P.includes(k))E[k]=(E[k]||0)+1;save();$("trainingFeedback").textContent=`❌ Erreur sur « ${k.toUpperCase()} » — enregistrée.`}stats()}render();if(v===target)setTimeout(()=>{if(started)next()},300)});const returnToLearning = function(){
-  started=false;
-  if(typeof window.showLearningHub === "function") window.showLearningHub();
-};
-window.returnToLearning = returnToLearning;
-
-if($("homeTraining"))$("homeTraining").onclick=window.showLearningHub;
-if($("learningBack"))$("learningBack").onclick=showHome;
-if($("trainingBack"))$("trainingBack").onclick=window.returnToLearning;
-if($("trainingModuleRestart"))$("trainingModuleRestart").onclick=start;
-if($("openTargeted"))$("openTargeted").onclick=()=>{window.showLearningModule("trainingScreen");start()};
-if($("openFinger"))$("openFinger").onclick=()=>{window.showLearningModule("fingerTrainingScreen");if(typeof window.prepareFingerTraining==="function")window.prepareFingerTraining()};
-if($("trainingResetErrors"))$("trainingResetErrors").onclick=()=>{E={};save();stats();$("trainingFeedback").textContent="Suivi des erreurs réinitialisé."};if($("trainingInput"))stats()})();
-
-(function(){
-  function initRowsModule(){
-const levels=[{title:"Ligne du haut",desc:"A Z E R T Y U I O P",preview:"A Z E R T Y",guidance:"Travaille la rangée supérieure du clavier.",keys:["a","z","e","r","t","y","u","i","o","p","a","z"]},{title:"Ligne du milieu",desc:"Q S D F G H J K L M",preview:"Q S D F G H",guidance:"C'est la rangée de repos : garde tes mains bien placées.",keys:["q","s","d","f","g","h","j","k","l","m","f","j"]},{title:"Ligne du bas",desc:"W X C V B N",preview:"W X C V B N",guidance:"Travaille la rangée inférieure avec précision.",keys:["w","x","c","v","b","n","w","x","c","v","b","n"]},{title:"Haut + milieu",desc:"A Z E R T + Q S D F",preview:"A Z E R — Q S D F",guidance:"Passe de la rangée du haut à la rangée centrale.",keys:["a","q","z","s","e","d","r","f","t","g","y","h"]},{title:"Milieu + bas",desc:"Q S D F + W X C V",preview:"Q S D F — W X C V",guidance:"Alterne les deux rangées sans regarder le clavier.",keys:["q","w","s","x","d","c","f","v","g","b","h","n"]},{title:"Les trois rangées",desc:"Haut + milieu + bas",preview:"A Z E — Q S D — W X C",guidance:"Utilise les trois rangées avec fluidité.",keys:["a","q","w","z","s","x","e","d","c","r","f","v","t","g","b","y","h","n"]}];const rows=[["²","&","é","\"","'","(","-","è","_","ç","à",")","="],["A","Z","E","R","T","Y","U","I","O","P","^","$"],["Q","S","D","F","G","H","J","K","L","M","ù","*"],["W","X","C","V","B","N","?",";",":","!"],["CTRL","ALT","ESPACE","ALT","CTRL"]];let level=0,idx=0,running=false,errors=0;const $=id=>document.getElementById(id);function build(){$("rowKeyboard").innerHTML="";rows.forEach((r,ri)=>{let line=document.createElement("div");line.className="row-line";r.forEach(k=>{let b=document.createElement("div");b.className="row-key";b.dataset.key=k.toLowerCase();b.textContent=k;line.appendChild(b)});$("rowKeyboard").appendChild(line)});$("rowLevels").innerHTML=levels.map((x,i)=>`<button type="button" class="row-level ${i===level?"active":""}" data-level="${i}"><strong>${x.title}</strong><br><small>${x.desc}</small></button>`).join("");document.querySelectorAll(".row-level").forEach(b=>b.onclick=()=>{level=+b.dataset.level;prepare()})}function prepare(){running=false;idx=0;errors=0;const x=levels[level];$("rowExerciseName").textContent=x.title;$("rowTargetPreview").textContent=x.preview;$("rowGuidance").textContent=x.guidance;$("rowCounter").textContent=`0 / ${x.keys.length}`;$("rowStart").style.display="block";$("rowActive").style.display="none";$("rowFinish").style.display="none";document.querySelectorAll(".row-level").forEach(b=>b.classList.toggle("active",+b.dataset.level===level));paint()}function paint(){const expected=levels[level].keys[idx];document.querySelectorAll(".row-key").forEach(k=>k.classList.toggle("target",running&&k.dataset.key===expected));$("rowProgress").style.width=(idx/levels[level].keys.length*100)+"%"}function startRows(){running=true;idx=0;errors=0;$("rowStart").style.display="none";$("rowActive").style.display="block";$("rowFinish").style.display="none";$("rowFeedback").textContent="";paint()}function key(e){if(!running)return;const expected=levels[level].keys[idx];if(e.key.toLowerCase()===expected){idx++;$("rowFeedback").textContent="✅ Correct !";$("rowCounter").textContent=`${idx} / ${levels[level].keys.length}`;if(idx>=levels[level].keys.length){running=false;$("rowProgress").style.width="100%";$("rowActive").style.display="none";$("rowFinish").style.display="block";$("rowFinishText").textContent=errors?`Bravo ! ${errors} erreur${errors>1?"s":""} sur cet exercice.`:"Parfait ! Aucune erreur.";}else paint()}else{errors++;$("rowFeedback").textContent=`❌ Mauvaise touche — essaie ${expected.toUpperCase()}`;const el=[...document.querySelectorAll(".row-key")].find(k=>k.dataset.key===e.key.toLowerCase());if(el){el.classList.add("bad");setTimeout(()=>el.classList.remove("bad"),180)}}}if($("openRows"))$("openRows").onclick=()=>{window.showLearningModule("rowTrainingScreen");prepare()};if($("rowHome"))$("rowHome").onclick=window.returnToLearning;if($("rowStart"))$("rowStart").onclick=startRows;if($("rowRestart"))$("rowRestart").onclick=startRows;if($("rowRestartTop"))$("rowRestartTop").onclick=startRows;window.addEventListener("keydown",key);if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",()=>{build();prepare()},{once:true});}else{build();prepare();}
-  }
-  if(document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initRowsModule, {once:true});
-  } else {
-    initRowsModule();
-  }
-})();
-</script>
-
-<script>
-(function(){
-  const fingerExercises=[
-    {title:"Position de base",desc:"Q Z D F — J K L M",guidance:"Retrouve la ligne de repos sans regarder le clavier.",keys:["q","z","d","f","j","k","l","m","f","j","q","m"]},
-    {title:"Les index",desc:"F G — H J",guidance:"Les index couvrent F/G et H/J. Reviens toujours sur F et J.",keys:["f","g","f","j","h","j","f","g","h","j","f","j"]},
-    {title:"Main gauche",desc:"Q A Z E D R F T G V B C",guidance:"Travaille les déplacements de la main gauche en gardant l'index sur F.",keys:["q","a","z","e","d","r","f","t","g","v","b","c"]},
-    {title:"Main droite",desc:"J U K I L O M P H Y N",guidance:"Déplace la main droite en gardant l'index repère sur J.",keys:["j","u","k","i","l","o","m","p","h","y","n","j"]},
-    {title:"Alternance des mains",desc:"F J D K S L A M",guidance:"Alterne gauche et droite sans regarder le clavier.",keys:["f","j","d","k","s","l","a","m","f","j","d","k"]},
-    {title:"Retour au repos",desc:"Q Z D F — J K L M",guidance:"Après chaque déplacement, retrouve rapidement ta position de base.",keys:["q","j","z","k","d","l","f","m","f","j","z","k"]}
-  ];
-  const keyRows=[["²","&","é","\"","'","(","-","è","_","ç","à",")","="],["A","Z","E","R","T","Y","U","I","O","P","^","$"],["Q","S","D","F","G","H","J","K","L","M","ù","*"],["W","X","C","V","B","N","?",";",":","!"],["CTRL","ALT","ESPACE","ALT","CTRL"]];
-  const map={q:["Auriculaire gauche","#ff6b6b"],a:["Auriculaire gauche","#ff6b6b"],w:["Auriculaire gauche","#ff6b6b"],z:["Annulaire gauche","#f7b267"],s:["Annulaire gauche","#f7b267"],x:["Annulaire gauche","#f7b267"],e:["Majeur gauche","#7bdff2"],d:["Majeur gauche","#7bdff2"],c:["Majeur gauche","#7bdff2"],r:["Index gauche","#b8f2e6"],t:["Index gauche","#b8f2e6"],f:["Index gauche","#b8f2e6"],g:["Index gauche","#b8f2e6"],v:["Index gauche","#b8f2e6"],b:["Index gauche","#b8f2e6"],y:["Index droit","#b8f2e6"],u:["Index droit","#b8f2e6"],h:["Index droit","#b8f2e6"],j:["Index droit","#b8f2e6"],n:["Index droit","#b8f2e6"],i:["Majeur droit","#7bdff2"],k:["Majeur droit","#7bdff2"],o:["Annulaire droit","#f7b267"],l:["Annulaire droit","#f7b267"],p:["Auriculaire droit","#ff6b6b"],m:["Auriculaire droit","#ff6b6b"]};
-  let level=0,index=0,running=false,errors=0;
-  const $=id=>document.getElementById(id);
-  function buildKeyboard(){const root=$("fingerKeyboard");if(!root)return;root.innerHTML="";keyRows.forEach(row=>{const line=document.createElement("div");line.className="finger-row";row.forEach(key=>{const b=document.createElement("div");b.className="finger-key";b.dataset.key=key.toLowerCase();b.textContent=key;const info=map[key.toLowerCase()];if(info){b.style.borderColor=info[1];b.style.boxShadow="inset 0 -3px 0 "+info[1]+"33"}if(["q","z","d","f","j","k","l","m"].includes(key.toLowerCase()))b.classList.add("home-key");line.appendChild(b)});root.appendChild(line)})}
-  function renderLevels(){const root=$("fingerLevels");if(!root)return;root.innerHTML=fingerExercises.map((x,i)=>`<button type="button" class="finger-level ${i===level?"active":""}" data-level="${i}"><strong>${x.title}</strong><small>${x.desc}</small></button>`).join("");root.querySelectorAll(".finger-level").forEach(btn=>btn.addEventListener("click",()=>{level=Number(btn.dataset.level)||0;prepare()}))}
-  function paint(){const ex=fingerExercises[level],expected=ex.keys[index]||"";document.querySelectorAll(".finger-key").forEach(k=>k.classList.toggle("target",running&&k.dataset.key===expected));$("fingerProgress").style.width=(index/ex.keys.length*100)+"%";$("fingerCounter").textContent=index+" / "+ex.keys.length;$("fingerTargetKey").textContent=(expected||"✓").toUpperCase();const info=map[expected]||["Touche",""];$("fingerTargetFinger").textContent=info[0]?"☝️ "+info[0]:""}
-  function prepare(){running=false;index=0;errors=0;const ex=fingerExercises[level];$("fingerIdle").style.display="block";$("fingerActive").style.display="none";$("fingerFinish").style.display="none";$("fingerFeedback").textContent="Appuie sur la touche indiquée.";$("fingerCounter").textContent="0 / "+ex.keys.length;renderLevels();paint()}
-  function start(){running=true;index=0;errors=0;$("fingerIdle").style.display="none";$("fingerActive").style.display="block";$("fingerFinish").style.display="none";$("fingerFeedback").textContent="Appuie sur la touche indiquée.";paint()}
-  function finish(){running=false;$("fingerProgress").style.width="100%";$("fingerActive").style.display="none";$("fingerFinish").style.display="block";$("fingerFinishText").textContent=errors?`Bravo ! ${errors} erreur${errors>1?"s":""}. Recommence pour améliorer ta mémoire musculaire.`:"Parfait ! Aucune erreur. Tes doigts sont bien placés. 💪";paint()}
-  function handleKey(e){if(!running)return;if(e.ctrlKey||e.altKey||e.metaKey)return;const key=e.key.toLowerCase(),expected=fingerExercises[level].keys[index];if(key===expected){index++;$("fingerFeedback").textContent=index>=fingerExercises[level].keys.length?"✅ Exercice terminé !":"✅ Correct ! Reviens à la position de base si nécessaire.";if(index>=fingerExercises[level].keys.length)finish();else paint();return}errors++;const info=map[expected]||["la touche",""];$("fingerFeedback").textContent=`❌ Mauvaise touche. Utilise ${info[0].toLowerCase()} pour « ${expected.toUpperCase()} » .`;const bad=[...document.querySelectorAll(".finger-key")].find(k=>k.dataset.key===key);if(bad){bad.classList.add("bad");setTimeout(()=>bad.classList.remove("bad"),180)}}
-  window.prepareFingerTraining=prepare;
-  if($("fingerHome"))$("fingerHome").onclick=()=>{running=false;window.returnToLearning()};
-  if($("fingerRestartTop"))$("fingerRestartTop").onclick=start;
-  if($("fingerStart"))$("fingerStart").onclick=start;
-  if($("fingerRestart"))$("fingerRestart").onclick=start;
-  if($("fingerGiveTip"))$("fingerGiveTip").onclick=()=>{const expected=fingerExercises[level].keys[index]||"",info=map[expected]||["Touche",""];$("fingerFeedback").textContent=`💡 ${info[0]} : vise « ${expected.toUpperCase()} » puis reviens à ta position de repos.`};
-  window.addEventListener("keydown",handleKey);
-  function init(){buildKeyboard();renderLevels();prepare()}
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
-})();
-</script>
-
-<div id="comboMilestone" class="combo-milestone" aria-live="polite" aria-atomic="true" aria-hidden="true">
-  <div class="combo-milestone__content">
-    <span id="comboMilestoneIcon" class="combo-milestone__icon" aria-hidden="true">🔥</span>
-    <span id="comboMilestoneText" class="combo-milestone__text">COMBO x5</span>
-    <span id="comboMilestoneSub" class="combo-milestone__sub">Bonne série !</span>
-  </div>
+<footer>Test de rapidité clavier — version locale</footer>
 </div>
 
 <script>
-(function(){
-  const ids=["homeScreen","learningHub","trainingScreen","rowTrainingScreen","fingerTrainingScreen","statistics","customize","profileEditor","result","game","workspace"];
-  function hideAll(){
-    ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;el.classList.remove("show");el.style.display="none";});
+const $ = id => document.getElementById(id);
+
+const screens = {
+  home: $("homeScreen"),
+  learning: $("learningScreen"),
+  exercise: $("exerciseScreen"),
+  test: $("testScreen"),
+  result: $("resultScreen")
+};
+
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screens[name].classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+// ---------- APPRENTISSAGE ----------
+const levels = [
+  {title:"Découvrir le clavier", desc:"Trouver les lettres, espace, entrée et retour arrière.", target:90, text:"A E S D F J"},
+  {title:"Position des doigts", desc:"Découvrir les touches F et J puis la position de base.", target:90, text:"F J F J ASDF JKLM"},
+  {title:"Touches de base", desc:"S'entraîner avec les rangées principales.", target:90, text:"asdf jklm fdsa mlkj"},
+  {title:"Toutes les lettres", desc:"Utiliser progressivement tout l'alphabet.", target:90, text:"azerty qsdfg wxcvb qwerty zxcv bnm"},
+  {title:"Les mots", desc:"Taper des mots simples sans regarder le clavier.", target:90, text:"sac vélo maison clavier souris écran"},
+  {title:"Majuscules & ponctuation", desc:"Utiliser majuscules, points, virgules et accents.", target:90, text:"Bonjour ! Comment allez-vous aujourd'hui ?"},
+  {title:"Phrases courtes", desc:"Taper des phrases simples avec précision.", target:90, text:"Le clavier est facile à apprendre."},
+  {title:"Phrases longues", desc:"Gagner en confort sur des phrases plus longues.", target:90, text:"Chaque jour, quelques minutes de pratique permettent de mieux utiliser son clavier."},
+  {title:"Entraînement vitesse", desc:"Un entraînement chronométré de 30 secondes.", target:90, text:"La rapidité vient avec la régularité. Tape calmement et garde une bonne position des doigts."},
+  {title:"Test final", desc:"Mesurer sa progression avec un test d'une minute.", target:90, text:"Bienvenue dans le test final de rapidité clavier. Le but est de taper avec précision tout en améliorant progressivement sa vitesse."}
+];
+
+let unlockedLevel = Number(localStorage.getItem("typingUnlocked") || 1);
+let currentLevel = 1;
+let levelStart = "";
+
+function renderLevels(){
+  const grid = $("levelGrid");
+  grid.innerHTML = "";
+  levels.forEach((level,i)=>{
+    const n=i+1;
+    const unlocked=n<=unlockedLevel;
+    const best=localStorage.getItem("typingBestL"+n);
+    const card=document.createElement("div");
+    card.className="card level-card"+(best?" best":"")+(unlocked?"":" locked");
+    card.innerHTML=`
+      <div class="level-number">${n}</div>
+      <h3>${level.title}</h3>
+      <p>${level.desc}</p>
+      <div class="level-meta">${best ? "Meilleur résultat : "+best+" %" : (unlocked ? "Disponible" : "🔒 Verrouillé")}</div>
+      <button class="btn ${unlocked?"btn-primary":"btn-secondary"}" ${unlocked?"":"disabled"} data-level="${n}">
+        ${unlocked ? (n===10?"Mesurer":"Commencer") : "Verrouillé"}
+      </button>`;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll("[data-level]").forEach(btn=>{
+    btn.addEventListener("click",()=>startLearning(Number(btn.dataset.level)));
+  });
+}
+
+function buildKeyboard(){
+  const rows=["AZERTYUIOP","QSDFGHJKLM","WXCVBN"];
+  $("keyboard").innerHTML=rows.map(row=>`
+    <div class="key-row">${[...row].map(k=>`<div class="key" data-key="${k.toLowerCase()}">${k}</div>`).join("")}</div>
+  `).join("") + `<div class="key-row"><div class="key space" data-key=" ">ESPACE</div></div>`;
+}
+
+function startLearning(level){
+  currentLevel=level;
+  const data=levels[level-1];
+  levelStart=data.text;
+  $("exerciseTitle").textContent=`Exercice ${level}/10 — ${data.title}`;
+  $("exerciseSubtitle").textContent=data.desc;
+  $("exerciseInstruction").textContent=level===10
+    ?"Le test final dure 60 secondes."
+    :`Recopie le texte ci-dessous avec au moins ${data.target} % de précision.`;
+  $("exerciseProgress").style.width=(level/10*100)+"%";
+  $("learningInput").value="";
+  $("learningInput").disabled=false;
+  $("learningInput").focus();
+  $("nextExercise").disabled=true;
+  $("learningInput").placeholder=levelStart;
+  buildKeyboard();
+  showScreen("exercise");
+}
+
+function updateLearning(){
+  const typed=$("learningInput").value;
+  let correct=0, errors=0;
+  for(let i=0;i<typed.length;i++){
+    if(i<levelStart.length && typed[i]===levelStart[i]) correct++;
+    else errors++;
   }
-  window.showLearningHub=function(){
-    document.body.classList.remove("module-mode");
-    hideAll();
-    const hub=document.getElementById("learningHub");
-    if(hub){hub.classList.add("show");hub.style.display="block";}
-    window.scrollTo(0,0);
-  };
-  window.showLearningModule=function(id){
-    document.body.classList.add("module-mode");
-    hideAll();
-    const target=document.getElementById(id);
-    if(target){target.classList.add("show");target.style.display="block";}
-    window.scrollTo(0,0);
-  };
-  window.returnToLearning=function(){window.showLearningHub();};
-})();
+  const accuracy=typed.length ? correct/typed.length*100 : 0;
+  $("learningAccuracy").textContent=accuracy.toFixed(1)+" %";
+  $("learningErrors").textContent=errors;
+  $("learningCorrect").textContent=correct;
+  $("nextExercise").disabled=!(typed.length>=levelStart.length && accuracy>=levels[currentLevel-1].target);
+  [...document.querySelectorAll(".key")].forEach(k=>k.classList.remove("active"));
+  const next=levelStart[typed.length];
+  if(next){
+    const key=document.querySelector(`.key[data-key="${CSS.escape(next.toLowerCase())}"]`);
+    if(key) key.classList.add("active");
+  }
+}
+$("learningInput").addEventListener("input",updateLearning);
+$("nextExercise").addEventListener("click",()=>{
+  const typed=$("learningInput").value;
+  let correct=0;
+  for(let i=0;i<typed.length;i++) if(i<levelStart.length && typed[i]===levelStart[i]) correct++;
+  const acc=typed.length?correct/typed.length*100:0;
+  localStorage.setItem("typingBestL"+currentLevel,Math.max(Number(localStorage.getItem("typingBestL"+currentLevel)||0),acc).toFixed(1));
+  if(currentLevel<10){
+    unlockedLevel=Math.max(unlockedLevel,currentLevel+1);
+    localStorage.setItem("typingUnlocked",unlockedLevel);
+    renderLevels();
+    startLearning(currentLevel+1);
+  }else{
+    startTypingTest();
+  }
+});
+$("helpButton").addEventListener("click",()=>{
+  alert("Regarde la touche mise en évidence sur le clavier. Prends ton temps : la précision est plus importante que la vitesse.");
+});
+
+// ---------- TEST 1 MINUTE ----------
+let expectedText="";
+let startTime=null;
+let timerInterval=null;
+let testFinished=false;
+let isResetting=false;
+const TEST_DURATION=60;
+
+const testTexts=[
+"Le clavier est un outil simple et utile. Entraîne-toi régulièrement pour gagner en confiance et en rapidité.",
+"Une bonne position des doigts aide à taper plus facilement. Garde les épaules détendues et regarde moins le clavier.",
+"Chaque exercice permet de progresser. Commence doucement, fais attention aux erreurs, puis augmente progressivement ta vitesse.",
+"Le meilleur moyen de devenir rapide est de pratiquer souvent. La précision doit rester une priorité pendant toute la séance."
+];
+
+function chooseTestText(){
+  expectedText=testTexts[Math.floor(Math.random()*testTexts.length)];
+  $("testText").textContent=expectedText+" "+expectedText+" "+expectedText;
+}
+
+function startTypingTest(){
+  showScreen("test");
+  resetTest(false);
+  chooseTestText();
+  $("typingInput").focus();
+}
+
+function calculateTestResults(){
+  const typed=$("typingInput").value;
+  let correct=0, errors=0;
+  for(let i=0;i<typed.length;i++){
+    if(i<expectedText.length*3 && typed[i]===($("testText").textContent)[i]) correct++;
+    else errors++;
+  }
+  const total=typed.length;
+  const accuracy=total?correct/total*100:0;
+  return {total,correct,errors,accuracy};
+}
+
+function displayTestResults(results,seconds){
+  const minutes=seconds/60;
+  const wpm=minutes>0?results.total/5/minutes:0;
+  const net=minutes>0?results.correct/5/minutes:0;
+  $("speed").textContent=wpm.toFixed(1);
+  $("netSpeed").textContent=net.toFixed(1);
+  $("accuracy").textContent=results.accuracy.toFixed(1);
+  $("errors").textContent=results.errors;
+}
+
+function updateLiveTest(){
+  if(!startTime || testFinished || isResetting)return;
+  const seconds=Math.max((Date.now()-startTime)/1000,.001);
+  displayTestResults(calculateTestResults(),seconds);
+}
+
+function updateTimer(){
+  if(!startTime||testFinished||isResetting)return;
+  const elapsed=(Date.now()-startTime)/1000;
+  const left=Math.max(0,Math.ceil(TEST_DURATION-elapsed));
+  $("timeLeft").textContent=left+" s";
+  if(elapsed>=TEST_DURATION) finishTest();
+}
+
+function finishTest(){
+  if(testFinished)return;
+  testFinished=true;
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  $("typingInput").disabled=true;
+  $("typingInput").readOnly=true;
+  const results=calculateTestResults();
+  displayTestResults(results,TEST_DURATION);
+  $("finalSpeed").textContent=(results.total/5).toFixed(1)+" MPM";
+  $("finalNetSpeed").textContent=(results.correct/5).toFixed(1)+" MPM";
+  $("finalAccuracy").textContent=results.accuracy.toFixed(1)+" %";
+  $("finalErrors").textContent=results.errors;
+  const v=$("validation");
+  v.textContent=results.accuracy>=90 && results.total>0?"Validé":"Non validé";
+  v.className="validation "+(results.accuracy>=90&&results.total>0?"ok":"no");
+  showScreen("result");
+}
+
+function preventModification(e){
+  if(testFinished||isResetting){
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}
+["keydown","paste","cut","drop","beforeinput"].forEach(evt=>$("typingInput").addEventListener(evt,preventModification));
+
+$("typingInput").addEventListener("input",()=>{
+  if(testFinished||isResetting)return;
+  if(startTime===null && $("typingInput").value.length>0){
+    startTime=Date.now();
+    timerInterval=setInterval(updateTimer,100);
+  }
+  updateLiveTest();
+});
+
+function resetTest(goToTest=true){
+  if(isResetting)return;
+  isResetting=true;
+  $("resetButton").disabled=true;
+  $("resetButton").textContent="Réinitialisation...";
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  startTime=null;
+  testFinished=false;
+  $("typingInput").disabled=false;
+  $("typingInput").readOnly=false;
+  $("typingInput").value="";
+  $("timeLeft").textContent="60 s";
+  $("speed").textContent="0.0";
+  $("netSpeed").textContent="0.0";
+  $("accuracy").textContent="0.0";
+  $("errors").textContent="0";
+  $("typingInput").focus();
+  isResetting=false;
+  $("resetButton").disabled=false;
+  $("resetButton").textContent="Recommencer";
+  if(goToTest)showScreen("test");
+}
+
+// ---------- NAVIGATION ----------
+$("startTestHome").addEventListener("click",startTypingTest);
+$("openLearning").addEventListener("click",()=>{renderLevels();showScreen("learning");});
+$("backHomeLearning").addEventListener("click",()=>showScreen("home"));
+$("backLearning").addEventListener("click",()=>{renderLevels();showScreen("learning");});
+$("backHomeTest").addEventListener("click",()=>{if(timerInterval){clearInterval(timerInterval);timerInterval=null;}testFinished=true;showScreen("home");});
+$("resetButton").addEventListener("click",()=>{resetTest(false);chooseTestText();showScreen("test");});
+$("finalHome").addEventListener("click",()=>showScreen("home"));
+$("finalLearning").addEventListener("click",()=>{renderLevels();showScreen("learning");});
+
+renderLevels();
 </script>
 </body>
 </html>
