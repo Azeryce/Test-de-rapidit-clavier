@@ -1,3 +1,2 @@
-# TypeRush
-TypeRush - Jeu de vitesse de frappe
-C'est un jeux ou vous pouvez voir a qu'elle rapiditer vous frapper sur votre clavier 
+# Test de rapidité clavier
+Apprends à utiliser ton clavier pas à pas, puis mesure ta vitesse sur un test d'une minute.
