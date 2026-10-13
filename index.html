@@ -310,16 +310,16 @@ function showScreen(name){
 // Chaque niveau contient trois exercices progressifs. Les accents arrivent
 // après la mémorisation des touches et des rangées principales.
 const levels = [
-  {title:"Découvrir le clavier",desc:"Repérer les lettres et les touches utiles.",target:90,exercises:["A E S D F J","ESPACE A S D F","A E S D F J ESPACE"]},
-  {title:"Position des doigts",desc:"Placer les doigts sur la rangée de repos : QSDF et JKLM.",target:90,exercises:["F J F J F J","asdf jklm","qsdf jklm asdf"]},
+  {title:"Découvrir le clavier",desc:"Repérer les lettres et les touches utiles.",target:90,exercises:["a e s d f j","espace a s d f","a e s d f j espace"]},
+  {title:"Position des doigts",desc:"Placer les doigts sur la rangée de repos : QSDF et JKLM.",target:90,exercises:["f j f j f j","asdf jklm","qsdf jklm asdf"]},
   {title:"Rangée du milieu",desc:"Prendre l'habitude de revenir à la position de base.",target:90,exercises:["qsdf jklm","asdfg hjklm","fff jjj ddd kkk sss lll"]},
   {title:"Rangée du haut et du bas",desc:"Étendre progressivement les mouvements des doigts.",target:90,exercises:["azerty uiop","wxcv bnm","azerty qsdfg wxcvb"]},
   {title:"Mots simples",desc:"Combiner les lettres pour former des mots courants.",target:90,exercises:["sac vélo lune","maison souris clavier","bonjour merci école fenêtre"]},
-  {title:"Majuscules et ponctuation",desc:"Utiliser Majuscule, point, virgule et apostrophe.",target:90,exercises:["Bonjour. Salut !","Léo, viens ici.","Aujourd'hui, je tape. Ça va ?"]},
+  {title:"Ponctuation et apostrophes",desc:"Utiliser les points, virgules, espaces et apostrophes.",target:90,exercises:["bonjour. salut !","léo, viens ici.","aujourd'hui, je tape. ça va ?"]},
   {title:"Accents français",desc:"Pratiquer é, è, ê, ë, à, ù, ç et les caractères accentués.",target:88,exercises:["é è ê ë","à â î ô ù û ç","été, très tôt, où est la clé ?"]},
-  {title:"Phrases courtes",desc:"Recopier des phrases entières avec les espaces et la ponctuation.",target:90,exercises:["Le chat dort sur le canapé.","Élodie prépare déjà le déjeuner.","Ça y est, j'ai terminé mon exercice !"]},
-  {title:"Phrases longues",desc:"Garder une frappe régulière sur des textes plus longs.",target:90,exercises:["Chaque jour, je m'entraîne un peu.","Une bonne position des doigts aide à taper sans fatigue.","Même si je fais une erreur, je ralentis et je continue avec précision."]},
-  {title:"Défi final",desc:"Combiner lettres, accents, majuscules et ponctuation.",target:90,exercises:["Déjà, je connais mieux mon clavier.","À force de pratiquer, mes doigts trouvent les touches plus facilement.","Félicitations ! Tu as appris les bases : continue à t'entraîner régulièrement."]}
+  {title:"Phrases courtes",desc:"Recopier des phrases entières avec les espaces et la ponctuation.",target:90,exercises:["le chat dort sur le canapé.","élodie prépare déjà le déjeuner.","ça y est, j'ai terminé mon exercice !"]},
+  {title:"Phrases longues",desc:"Garder une frappe régulière sur des textes plus longs.",target:90,exercises:["chaque jour, je m'entraîne un peu.","une bonne position des doigts aide à taper sans fatigue.","même si je fais une erreur, je ralentis et je continue avec précision."]},
+  {title:"Défi final",desc:"Combiner lettres, accents, majuscules et ponctuation.",target:90,exercises:["déjà, je connais mieux mon clavier.","à force de pratiquer, mes doigts trouvent les touches plus facilement.","félicitations ! tu as appris les bases : continue à t'entraîner régulièrement."]}
 ];
 let unlockedLevel = Number(localStorage.getItem("typingUnlocked") || 1);
 let currentLevel = 1;
@@ -398,7 +398,7 @@ function recordMistake(key){
 }
 
 function buildKeyboard(){
-  const rows=["AZERTYUIOP","QSDFGHJKLM","WXCVBN"];
+  const rows=["azertyuiop","qsdfghjklm","wxcvbn"];
   $("keyboard").innerHTML=rows.map(row=>`<div class="key-row">${[...row].map(k=>`<div class="key ${fingerClass[k.toLowerCase()]||""}" data-key="${k.toLowerCase()}">${k}</div>`).join("")}</div>`).join("")+
     `<div class="key-row"><div class="key space" data-key=" ">ESPACE</div></div>`;
 }
