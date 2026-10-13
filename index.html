@@ -409,7 +409,8 @@ function startLearning(level, exerciseIndex=0){
   currentLevel=level;
   currentExercise=exerciseIndex;
   const data=levels[level-1];
-  levelStart=data.exercises[currentExercise];
+  // Les exercices restent en minuscules, y compris les lettres accentuées (Ç devient ç).
+  levelStart=data.exercises[currentExercise].toLocaleLowerCase("fr");
   $("exerciseTitle").textContent=`Niveau ${level}/10 — ${data.title}`;
   $("exerciseSubtitle").textContent=data.desc;
   $("exerciseInstruction").textContent=`Recopie le texte ci-dessous. Objectif : ${data.target} % de précision minimum. Le prochain exercice démarrera automatiquement quand tu auras tout recopié correctement.`;
