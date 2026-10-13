@@ -118,8 +118,13 @@ p{line-height:1.6}
 .keyboard{margin:24px auto;max-width:900px}
 .key small{font-size:.55rem;font-weight:600;opacity:.8}
 .key.finger-left-pinky{border-bottom:4px solid #e879f9}.key.finger-left-ring{border-bottom:4px solid #60a5fa}.key.finger-left-middle{border-bottom:4px solid #34d399}.key.finger-left-index{border-bottom:4px solid #fbbf24}.key.finger-right-index{border-bottom:4px solid #fb923c}.key.finger-right-middle{border-bottom:4px solid #a78bfa}.key.finger-right-ring{border-bottom:4px solid #f87171}.key.finger-right-pinky{border-bottom:4px solid #94a3b8}
-.finger-guide{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 22px;color:var(--muted);font-size:.82rem}
+.finger-guide{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 12px;color:var(--muted);font-size:.82rem}
 .finger-guide span{padding:6px 9px;border:1px solid var(--border);background:var(--panel2);border-radius:9px}
+.next-finger{padding:12px 15px;border-radius:13px;background:#eef2ff;border:1px solid #cfd6ff;color:#3946a6;font-weight:800;margin:10px 0 18px}
+.smart-training{margin:16px 0;padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--panel2)}
+.smart-training p{margin:6px 0;color:var(--muted)}
+.key-badges{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.key-badge{border:1px solid #f3c4c4;background:#fff0f0;color:#9f2929;border-radius:9px;padding:6px 10px;font-weight:800}
 .exercise-step{font-size:.9rem;color:var(--muted);font-weight:700;margin:8px 0}
 .key-row{display:flex;justify-content:center;gap:7px;margin:7px 0}
 .key{
@@ -195,6 +200,12 @@ footer{text-align:center;color:var(--muted);padding:25px}
     <button class="btn btn-secondary" id="backHomeLearning">Accueil</button>
   </div>
   <div class="grid" id="levelGrid"></div>
+  <div class="smart-training" id="smartTraining" style="margin-top:22px">
+    <strong>🧠 Entraînement intelligent</strong>
+    <p id="smartTrainingText">Je repère les touches qui te posent le plus de difficultés et je te proposerai un exercice ciblé.</p>
+    <div class="key-badges" id="weakKeys"></div>
+    <button class="btn btn-secondary" id="targetedTrainingButton" type="button">🎯 Entraîner mes touches difficiles</button>
+  </div>
 </section>
 
 <section id="exerciseScreen" class="screen">
@@ -212,8 +223,9 @@ footer{text-align:center;color:var(--muted);padding:25px}
     <div class="learning-target" id="learningTarget" aria-label="Texte à recopier"></div>
     <div class="keyboard" id="keyboard"></div>
     <div class="finger-guide" id="fingerGuide">
-      <span>🩷 Auriculaire gauche</span><span>🔵 Annulaire gauche</span><span>🟢 Majeur gauche</span><span>🟡 Index gauche</span><span>🟠 Index droit</span><span>🟣 Majeur droit</span><span>🔴 Annulaire droit</span><span>⚪ Auriculaire droit</span>
+      <span>🩷 Auriculaire gauche</span><span>🔵 Annulaire gauche</span><span>🟢 Majeur gauche</span><span>🟡 Index gauche</span><span>🟠 Index droit</span><span>🟣 Majeur droit</span><span>🔴 Annulaire droit</span><span>⚪ Auriculaire droit</span><span>👍 Pouce : espace</span>
     </div>
+    <div class="next-finger" id="nextFinger" aria-live="polite">Doigt conseillé : regarde la touche mise en évidence.</div>
     <textarea id="learningInput" placeholder="Écris ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div class="stats">
       <div class="stat"><span>Précision</span><strong id="learningAccuracy">0 %</strong></div>
@@ -314,6 +326,11 @@ let currentLevel = 1;
 let currentExercise = 0;
 let levelStart = "";
 let exerciseAdvancePending = false;
+let targetedTraining = false;
+let recordedMistakes = new Set();
+let targetedText = "";
+let keyMistakes = {};
+try { keyMistakes = JSON.parse(localStorage.getItem("typingKeyMistakes") || "{}"); } catch { keyMistakes = {}; }
 
 function renderLevels(){
   const grid = $("levelGrid");
@@ -337,26 +354,65 @@ function renderLevels(){
   grid.querySelectorAll("[data-level]").forEach(btn=>btn.addEventListener("click",()=>startLearning(Number(btn.dataset.level))));
 }
 
+// Répartition des touches selon les colonnes du clavier français AZERTY.
 const fingerClass={
-  a:"finger-left-pinky",q:"finger-left-pinky",w:"finger-left-ring",s:"finger-left-ring",x:"finger-left-ring",
-  e:"finger-left-middle",d:"finger-left-middle",c:"finger-left-middle",r:"finger-left-index",f:"finger-left-index",v:"finger-left-index",t:"finger-left-index",g:"finger-left-index",
-  y:"finger-right-index",h:"finger-right-index",b:"finger-right-index",n:"finger-right-index",u:"finger-right-index",j:"finger-right-index",m:"finger-right-index",
-  i:"finger-right-middle",k:"finger-right-middle",o:"finger-right-ring",l:"finger-right-ring",p:"finger-right-pinky",z:"finger-left-pinky", " ":""
+  a:"finger-left-pinky",z:"finger-left-ring",e:"finger-left-middle",r:"finger-left-index",t:"finger-left-index",
+  y:"finger-right-index",u:"finger-right-index",i:"finger-right-middle",o:"finger-right-ring",p:"finger-right-pinky",
+  q:"finger-left-pinky",s:"finger-left-ring",d:"finger-left-middle",f:"finger-left-index",g:"finger-left-index",
+  h:"finger-right-index",j:"finger-right-index",k:"finger-right-middle",l:"finger-right-ring",m:"finger-right-pinky",
+  w:"finger-left-pinky",x:"finger-left-ring",c:"finger-left-middle",v:"finger-left-index",b:"finger-right-index",n:"finger-right-index", " ":""
 };
+const fingerNames={
+  "finger-left-pinky":"auriculaire gauche", "finger-left-ring":"annulaire gauche", "finger-left-middle":"majeur gauche", "finger-left-index":"index gauche",
+  "finger-right-index":"index droit", "finger-right-middle":"majeur droit", "finger-right-ring":"annulaire droit", "finger-right-pinky":"auriculaire droit"
+};
+function getExpectedFinger(character){
+  if(character===" ") return "👍 Pouce : appuie sur la barre ESPACE.";
+  const base=character.toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const cls=fingerClass[base];
+  if(!cls) return "Utilise Maj (Shift) si la touche demande une majuscule ou un signe.";
+  return "Doigt conseillé : "+fingerNames[cls]+". La touche correspondante est surlignée sur le clavier.";
+}
+function renderSmartTraining(){
+  const entries=Object.entries(keyMistakes).filter(([,count])=>Number(count)>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const container=$("weakKeys");
+  if(!container) return;
+  container.innerHTML="";
+  if(!entries.length){
+    $("smartTrainingText").textContent="Aucune difficulté enregistrée pour le moment. Continue les exercices : les touches à retravailler apparaîtront ici.";
+    return;
+  }
+  $("smartTrainingText").textContent="Ces touches ont provoqué le plus d'erreurs dans tes exercices. Lance un entraînement ciblé pour les revoir.";
+  entries.forEach(([key,count])=>{
+    const badge=document.createElement("span");
+    badge.className="key-badge";
+    badge.textContent=(key===" "?"ESPACE":key.toLocaleUpperCase("fr"))+" · "+count;
+    container.appendChild(badge);
+  });
+}
+function recordMistake(key){
+  const normalized=key.toLocaleLowerCase("fr");
+  keyMistakes[normalized]=(Number(keyMistakes[normalized])||0)+1;
+  try{localStorage.setItem("typingKeyMistakes",JSON.stringify(keyMistakes));}catch(e){}
+  renderSmartTraining();
+}
+
 function buildKeyboard(){
   const rows=["AZERTYUIOP","QSDFGHJKLM","WXCVBN"];
   $("keyboard").innerHTML=rows.map(row=>`<div class="key-row">${[...row].map(k=>`<div class="key ${fingerClass[k.toLowerCase()]||""}" data-key="${k.toLowerCase()}">${k}</div>`).join("")}</div>`).join("")+
     `<div class="key-row"><div class="key space" data-key=" ">ESPACE</div></div>`;
 }
 function startLearning(level, exerciseIndex=0){
+  targetedTraining=false;
   exerciseAdvancePending=false;
+  recordedMistakes=new Set();
   currentLevel=level;
   currentExercise=exerciseIndex;
   const data=levels[level-1];
   levelStart=data.exercises[currentExercise];
   $("exerciseTitle").textContent=`Niveau ${level}/10 — ${data.title}`;
   $("exerciseSubtitle").textContent=data.desc;
-  $("exerciseInstruction").textContent=`Recopie le texte ci-dessous. Objectif : ${data.target} % de précision minimum. Tu peux utiliser l'aide si tu bloques.`;
+  $("exerciseInstruction").textContent=`Recopie le texte ci-dessous. Objectif : ${data.target} % de précision minimum. Le prochain exercice démarrera automatiquement quand tu auras tout recopié correctement.`;
   $("exerciseProgress").style.width=(((level-1)+(currentExercise+1)/data.exercises.length)/levels.length*100)+"%";
   $("exerciseStep").textContent=`Exercice ${currentExercise+1} sur ${data.exercises.length}`;
   $("learningInput").value="";
@@ -370,6 +426,8 @@ function startLearning(level, exerciseIndex=0){
   $("nextExercise").textContent=currentExercise===2?(level===10?"Terminer →":"Valider le niveau →"):"Exercice suivant →";
   buildKeyboard();
   renderLearningTarget("");
+  renderSmartTraining();
+  $("nextFinger").textContent=getExpectedFinger(levelStart[0]||"");
   showScreen("exercise");
   $("learningInput").focus();
 }
@@ -400,12 +458,20 @@ function updateLearning(){
     if(i<levelStart.length&&typed[i]===levelStart[i])correct++;else errors++;
   }
   const accuracy=typed.length?correct/typed.length*100:0;
+  // Mémorise chaque caractère attendu raté une seule fois par exercice.
+  for(let i=0;i<typed.length && i<levelStart.length;i++) {
+    if(typed[i]!==levelStart[i]) {
+      const signature=i+"|"+typed[i]+"|"+levelStart[i];
+      if(!recordedMistakes.has(signature)){recordedMistakes.add(signature);recordMistake(levelStart[i]);}
+    }
+  }
   $("learningAccuracy").textContent=accuracy.toFixed(1)+" %";
   $("learningErrors").textContent=errors;
   $("learningCorrect").textContent=correct;
   const done=typed.length===levelStart.length && typed===levelStart && accuracy>=levels[currentLevel-1].target;
   $("nextExercise").disabled=!done || exerciseAdvancePending;
   renderLearningTarget(typed);
+  $("nextFinger").textContent=typed.length<levelStart.length?getExpectedFinger(levelStart[typed.length]):"✅ Parfait ! Prépare-toi pour la suite…";
   // Passe automatiquement à l'exercice suivant lorsque la saisie est parfaite.
   if(done && !exerciseAdvancePending){
     exerciseAdvancePending=true;
@@ -423,6 +489,13 @@ $("nextExercise").addEventListener("click",()=>{
   for(let i=0;i<typed.length;i++)if(typed[i]===levelStart[i])correct++;
   const acc=typed.length?correct/typed.length*100:0;
   if(acc<data.target)return;
+  if(targetedTraining){
+    targetedTraining=false;
+    renderLevels();
+    renderSmartTraining();
+    showScreen("learning");
+    return;
+  }
   if(currentExercise<data.exercises.length-1){
     startLearning(currentLevel,currentExercise+1);
     return;
@@ -441,12 +514,36 @@ $("nextExercise").addEventListener("click",()=>{
     $("backLearning").focus();
   }
 });
+
+function startTargetedTraining(){
+  const difficult=Object.entries(keyMistakes).filter(([,count])=>Number(count)>0).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([key])=>key);
+  if(!difficult.length){alert("Je n’ai pas encore assez de données. Fais quelques exercices et je repérerai les touches à retravailler !");return;}
+  const wordBank=["azerty","souris","clavier","école","déjà","fenêtre","garçon","ça","où","très","facile","exercice","bonjour","merci","précision","rapidité","maison","journée","français","répéter","question","vitesse","touche","apprendre"];
+  const matches=wordBank.filter(word=>difficult.some(key=>word.toLocaleLowerCase("fr").includes(key)));
+  const selected=[...matches,...wordBank.filter(word=>!matches.includes(word))].slice(0,8);
+  targetedText=selected.join(" ");
+  targetedTraining=true;
+  exerciseAdvancePending=false;
+  recordedMistakes=new Set();
+  levelStart=targetedText;
+  $("exerciseTitle").textContent="🎯 Entraînement personnalisé";
+  $("exerciseSubtitle").textContent="Un exercice créé à partir des touches qui t'ont posé le plus de difficultés.";
+  $("exerciseInstruction").textContent="Recopie ce texte. Quand tu le termines correctement, tu reviens automatiquement à tes niveaux.";
+  $("exerciseProgress").style.width="100%";
+  $("exerciseStep").textContent="Entraînement ciblé • touches à retravailler";
+  $("learningInput").value="";$("learningInput").disabled=false;$("learningInput").placeholder="Écris le texte personnalisé ici…";
+  $("learningAccuracy").textContent="0 %";$("learningErrors").textContent="0";$("learningCorrect").textContent="0";$("learningGoal").textContent=levels[currentLevel-1].target+" %";
+  $("nextExercise").disabled=true;$("nextExercise").textContent="Terminer l'entraînement →";
+  buildKeyboard();renderLearningTarget("");$("nextFinger").textContent=getExpectedFinger(levelStart[0]||"");
+  showScreen("exercise");$("learningInput").focus();
+}
+$("targetedTrainingButton").addEventListener("click",startTargetedTraining);
 $("helpButton").addEventListener("click",()=>{
   const next=levelStart[$("learningInput").value.length]||"fin de la phrase";
   let advice="Regarde la touche mise en évidence. Tape doucement et garde les poignets détendus.";
   if(currentLevel===2||currentLevel===3)advice+=" Pose tes doigts sur la rangée de repos : A, S, D, F à gauche et J, K, L, M à droite. Les index reviennent près de F et J.";
   if(currentLevel>=6)advice+=" Pour écrire une majuscule, maintiens Maj (Shift). Sur un clavier français, les accents et signes peuvent demander une combinaison de touches.";
-  alert(advice+"\n\nProchaine touche attendue : "+next);
+  alert(advice+"\n\n"+getExpectedFinger(levelStart[$("learningInput").value.length]||"")+"\nProchaine touche attendue : "+next);
 });
 
 // ---------- TEST 1 MINUTE ----------
@@ -642,6 +739,7 @@ $("finalHome").addEventListener("click",()=>showScreen("home"));
 $("finalLearning").addEventListener("click",()=>{renderLevels();showScreen("learning");});
 
 renderLevels();
+renderSmartTraining();
 </script>
 </body>
 </html>
