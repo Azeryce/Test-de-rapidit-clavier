@@ -235,6 +235,7 @@ footer{text-align:center;color:var(--muted);padding:25px}
       <div class="stat"><span>Vitesse nette</span><strong><span id="netSpeed" style="display:inline;color:inherit;font-size:inherit">0.0</span> MPM</strong></div>
       <div class="stat"><span>Précision</span><strong><span id="accuracy" style="display:inline;color:inherit;font-size:inherit">0.0</span> %</strong></div>
       <div class="stat"><span>Erreurs</span><strong id="errors">0</strong></div>
+      <div class="stat"><span>Record personnel</span><strong id="bestSpeed">0.0 MPM</strong></div>
     </div>
   </div>
 </section>
@@ -388,6 +389,8 @@ $("helpButton").addEventListener("click",()=>{
 
 // ---------- TEST 1 MINUTE ----------
 let expectedText="";
+let phraseQueue=[];
+let completedCharacters=0;
 let startTime=null;
 let timerInterval=null;
 let testFinished=false;
@@ -395,32 +398,85 @@ let isResetting=false;
 const TEST_DURATION=60;
 
 const testTexts=[
-"Le clavier est un outil simple et utile. Entraîne-toi régulièrement pour gagner en confiance et en rapidité.",
-"Une bonne position des doigts aide à taper plus facilement. Garde les épaules détendues et regarde moins le clavier.",
-"Chaque exercice permet de progresser. Commence doucement, fais attention aux erreurs, puis augmente progressivement ta vitesse.",
-"Le meilleur moyen de devenir rapide est de pratiquer souvent. La précision doit rester une priorité pendant toute la séance."
+"Le clavier est un outil simple et utile pour communiquer chaque jour.",
+"Une bonne position des doigts aide à taper plus facilement et sans fatigue.",
+"Commence doucement, fais attention aux erreurs, puis augmente ta vitesse.",
+"La précision reste importante même lorsque le chronomètre avance.",
+"Chaque exercice permet de progresser un peu plus qu'hier.",
+"Garde les épaules détendues et les poignets dans une position confortable.",
+"Regarde l'écran plutôt que tes mains pour mieux mémoriser les touches.",
+"Le soleil traverse les fenêtres et éclaire doucement la pièce.",
+"Demain, nous irons au marché pour choisir des fruits frais.",
+"Un petit effort régulier donne souvent de meilleurs résultats qu'une longue séance.",
+"Le train entre en gare tandis que les voyageurs attendent sur le quai.",
+"La pluie cesse enfin et les oiseaux reviennent dans le jardin.",
+"Prépare tes affaires la veille pour commencer la journée tranquillement.",
+"Un message clair est plus facile à lire et à comprendre.",
+"Les livres racontent des histoires, expliquent des idées et ouvrent l'imagination.",
+"Pour gagner du temps, relis calmement les consignes avant de commencer.",
+"Le vélo avance sur la piste pendant que le vent souffle dans les arbres.",
+"Dans la cuisine, une soupe chaude attend toute la famille.",
+"La musique accompagne parfois le travail, mais le calme aide aussi à se concentrer.",
+"Une phrase bien ponctuée rend le texte plus agréable à lire.",
+"Le chat observe un papillon qui vole près des fleurs colorées.",
+"Il faut parfois recommencer pour comprendre et réussir un nouvel exercice.",
+"Le dimanche matin, les rues sont calmes et les commerces ouvrent plus tard.",
+"Range les documents dans le bon dossier pour les retrouver facilement.",
+"La curiosité donne envie de découvrir de nouvelles choses et d'apprendre.",
+"Avant de partir, vérifie que tu as bien fermé la porte.",
+"Les nuages s'éloignent et laissent apparaître un ciel bleu.",
+"Une pause courte peut aider à retrouver son attention et son énergie.",
+"Le facteur dépose une lettre dans la boîte aux lettres.",
+"Entraîne-toi à ton rythme et remarque les progrès au fil des jours."
 ];
 
+function shuffleTestPhrases(){
+  phraseQueue=[...testTexts];
+  for(let i=phraseQueue.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [phraseQueue[i],phraseQueue[j]]=[phraseQueue[j],phraseQueue[i]];
+  }
+}
+
+function showNextTestPhrase(){
+  if(phraseQueue.length===0) shuffleTestPhrases();
+  expectedText=phraseQueue.shift();
+  $("testText").textContent=expectedText;
+  $("typingInput").value="";
+} 
+
 function chooseTestText(){
-  expectedText=testTexts[Math.floor(Math.random()*testTexts.length)];
-  $("testText").textContent=expectedText+" "+expectedText+" "+expectedText;
+  completedCharacters=0;
+  shuffleTestPhrases();
+  showNextTestPhrase();
 }
 
 function startTypingTest(){
   showScreen("test");
   resetTest(false);
   chooseTestText();
+  updateBestSpeed();
   $("typingInput").focus();
+}
+
+function updateBestSpeed(candidate=null){
+  const saved=Number(localStorage.getItem("typingMinuteBestSpeed") || 0);
+  const best=Math.max(saved, Number(candidate || 0));
+  $("bestSpeed").textContent=best.toFixed(1)+" MPM";
+  if(candidate!==null && Number(candidate)>saved){
+    localStorage.setItem("typingMinuteBestSpeed", Number(candidate).toFixed(1));
+  }
 }
 
 function calculateTestResults(){
   const typed=$("typingInput").value;
-  let correct=0, errors=0;
+  let currentCorrect=0, errors=0;
   for(let i=0;i<typed.length;i++){
-    if(i<expectedText.length*3 && typed[i]===($("testText").textContent)[i]) correct++;
+    if(i<expectedText.length && typed[i]===expectedText[i]) currentCorrect++;
     else errors++;
   }
-  const total=typed.length;
+  const total=completedCharacters+typed.length;
+  const correct=completedCharacters+currentCorrect;
   const accuracy=total?correct/total*100:0;
   return {total,correct,errors,accuracy};
 }
@@ -461,6 +517,7 @@ function finishTest(){
   $("finalNetSpeed").textContent=(results.correct/5).toFixed(1)+" MPM";
   $("finalAccuracy").textContent=results.accuracy.toFixed(1)+" %";
   $("finalErrors").textContent=results.errors;
+  updateBestSpeed(results.total/5);
   const v=$("validation");
   v.textContent=results.accuracy>=90 && results.total>0?"Validé":"Non validé";
   v.className="validation "+(results.accuracy>=90&&results.total>0?"ok":"no");
@@ -481,6 +538,10 @@ $("typingInput").addEventListener("input",()=>{
     startTime=Date.now();
     timerInterval=setInterval(updateTimer,100);
   }
+  if($("typingInput").value===expectedText){
+    completedCharacters+=expectedText.length;
+    showNextTestPhrase();
+  }
   updateLiveTest();
 });
 
@@ -500,6 +561,7 @@ function resetTest(goToTest=true){
   $("netSpeed").textContent="0.0";
   $("accuracy").textContent="0.0";
   $("errors").textContent="0";
+  updateBestSpeed();
   $("typingInput").focus();
   isResetting=false;
   $("resetButton").disabled=false;
