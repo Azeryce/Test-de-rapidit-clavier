@@ -111,7 +111,16 @@ p{line-height:1.6}
   background:#f4f5ff;border:1px solid #e0e4ff;border-radius:16px;padding:15px 18px;
   margin:20px 0;color:#4d5874
 }
+.learning-target{font-size:1.18rem;line-height:1.9;letter-spacing:.02em;white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f8ff;border:1px solid var(--border);border-radius:16px;padding:20px;margin:18px 0;color:#65708a;min-height:82px}
+.learning-target .typed-correct{color:#16845b;background:#e0f7ec;border-radius:3px}
+.learning-target .typed-wrong{color:#b42323;background:#ffe4e4;border-radius:3px}
+.learning-target .next-char{outline:2px solid var(--primary);outline-offset:2px;border-radius:3px;color:var(--text)}
 .keyboard{margin:24px auto;max-width:900px}
+.key small{font-size:.55rem;font-weight:600;opacity:.8}
+.key.finger-left-pinky{border-bottom:4px solid #e879f9}.key.finger-left-ring{border-bottom:4px solid #60a5fa}.key.finger-left-middle{border-bottom:4px solid #34d399}.key.finger-left-index{border-bottom:4px solid #fbbf24}.key.finger-right-index{border-bottom:4px solid #fb923c}.key.finger-right-middle{border-bottom:4px solid #a78bfa}.key.finger-right-ring{border-bottom:4px solid #f87171}.key.finger-right-pinky{border-bottom:4px solid #94a3b8}
+.finger-guide{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 22px;color:var(--muted);font-size:.82rem}
+.finger-guide span{padding:6px 9px;border:1px solid var(--border);background:var(--panel2);border-radius:9px}
+.exercise-step{font-size:.9rem;color:var(--muted);font-weight:700;margin:8px 0}
 .key-row{display:flex;justify-content:center;gap:7px;margin:7px 0}
 .key{
   min-width:42px;height:42px;padding:0 9px;border:1px solid #cfd6e8;
@@ -199,7 +208,12 @@ footer{text-align:center;color:var(--muted);padding:25px}
   <div class="exercise">
     <div class="progress"><div id="exerciseProgress"></div></div>
     <div class="instruction" id="exerciseInstruction"></div>
+    <div class="exercise-step" id="exerciseStep">Exercice 1 sur 3</div>
+    <div class="learning-target" id="learningTarget" aria-label="Texte à recopier"></div>
     <div class="keyboard" id="keyboard"></div>
+    <div class="finger-guide" id="fingerGuide">
+      <span>🩷 Auriculaire gauche</span><span>🔵 Annulaire gauche</span><span>🟢 Majeur gauche</span><span>🟡 Index gauche</span><span>🟠 Index droit</span><span>🟣 Majeur droit</span><span>🔴 Annulaire droit</span><span>⚪ Auriculaire droit</span>
+    </div>
     <textarea id="learningInput" placeholder="Écris ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div class="stats">
       <div class="stat"><span>Précision</span><strong id="learningAccuracy">0 %</strong></div>
@@ -281,21 +295,23 @@ function showScreen(name){
 }
 
 // ---------- APPRENTISSAGE ----------
+// Chaque niveau contient trois exercices progressifs. Les accents arrivent
+// après la mémorisation des touches et des rangées principales.
 const levels = [
-  {title:"Découvrir le clavier", desc:"Trouver les lettres, espace, entrée et retour arrière.", target:90, text:"A E S D F J"},
-  {title:"Position des doigts", desc:"Découvrir les touches F et J puis la position de base.", target:90, text:"F J F J ASDF JKLM"},
-  {title:"Touches de base", desc:"S'entraîner avec les rangées principales.", target:90, text:"asdf jklm fdsa mlkj"},
-  {title:"Toutes les lettres", desc:"Utiliser progressivement tout l'alphabet.", target:90, text:"azerty qsdfg wxcvb qwerty zxcv bnm"},
-  {title:"Les mots", desc:"Taper des mots simples sans regarder le clavier.", target:90, text:"sac vélo maison clavier souris écran"},
-  {title:"Majuscules & ponctuation", desc:"Utiliser majuscules, points, virgules et accents.", target:90, text:"Bonjour ! Comment allez-vous aujourd'hui ?"},
-  {title:"Phrases courtes", desc:"Taper des phrases simples avec précision.", target:90, text:"Le clavier est facile à apprendre."},
-  {title:"Phrases longues", desc:"Gagner en confort sur des phrases plus longues.", target:90, text:"Chaque jour, quelques minutes de pratique permettent de mieux utiliser son clavier."},
-  {title:"Entraînement vitesse", desc:"Un entraînement chronométré de 30 secondes.", target:90, text:"La rapidité vient avec la régularité. Tape calmement et garde une bonne position des doigts."},
-  {title:"Test final", desc:"Mesurer sa progression avec un test d'une minute.", target:90, text:"Bienvenue dans le test final de rapidité clavier. Le but est de taper avec précision tout en améliorant progressivement sa vitesse."}
+  {title:"Découvrir le clavier",desc:"Repérer les lettres et les touches utiles.",target:90,exercises:["A E S D F J","ESPACE A S D F","A E S D F J ESPACE"]},
+  {title:"Position des doigts",desc:"Placer les doigts sur la rangée de repos : QSDF et JKLM.",target:90,exercises:["F J F J F J","asdf jklm","qsdf jklm asdf"]},
+  {title:"Rangée du milieu",desc:"Prendre l'habitude de revenir à la position de base.",target:90,exercises:["qsdf jklm","asdfg hjklm","fff jjj ddd kkk sss lll"]},
+  {title:"Rangée du haut et du bas",desc:"Étendre progressivement les mouvements des doigts.",target:90,exercises:["azerty uiop","wxcv bnm","azerty qsdfg wxcvb"]},
+  {title:"Mots simples",desc:"Combiner les lettres pour former des mots courants.",target:90,exercises:["sac vélo lune","maison souris clavier","bonjour merci école fenêtre"]},
+  {title:"Majuscules et ponctuation",desc:"Utiliser Majuscule, point, virgule et apostrophe.",target:90,exercises:["Bonjour. Salut !","Léo, viens ici.","Aujourd'hui, je tape. Ça va ?"]},
+  {title:"Accents français",desc:"Pratiquer é, è, ê, ë, à, ù, ç et les caractères accentués.",target:88,exercises:["é è ê ë","à â î ô ù û ç","été, très tôt, où est la clé ?"]},
+  {title:"Phrases courtes",desc:"Recopier des phrases entières avec les espaces et la ponctuation.",target:90,exercises:["Le chat dort sur le canapé.","Élodie prépare déjà le déjeuner.","Ça y est, j'ai terminé mon exercice !"]},
+  {title:"Phrases longues",desc:"Garder une frappe régulière sur des textes plus longs.",target:90,exercises:["Chaque jour, je m'entraîne un peu.","Une bonne position des doigts aide à taper sans fatigue.","Même si je fais une erreur, je ralentis et je continue avec précision."]},
+  {title:"Défi final",desc:"Combiner lettres, accents, majuscules et ponctuation.",target:90,exercises:["Déjà, je connais mieux mon clavier.","À force de pratiquer, mes doigts trouvent les touches plus facilement.","Félicitations ! Tu as appris les bases : continue à t'entraîner régulièrement."]}
 ];
-
 let unlockedLevel = Number(localStorage.getItem("typingUnlocked") || 1);
 let currentLevel = 1;
+let currentExercise = 0;
 let levelStart = "";
 
 function renderLevels(){
@@ -311,80 +327,117 @@ function renderLevels(){
       <div class="level-number">${n}</div>
       <h3>${level.title}</h3>
       <p>${level.desc}</p>
-      <div class="level-meta">${best ? "Meilleur résultat : "+best+" %" : (unlocked ? "Disponible" : "🔒 Verrouillé")}</div>
+      <div class="level-meta">${best ? "Meilleure précision : "+best+" %" : (unlocked ? "3 exercices • Disponible" : "🔒 Verrouillé")}</div>
       <button class="btn ${unlocked?"btn-primary":"btn-secondary"}" ${unlocked?"":"disabled"} data-level="${n}">
-        ${unlocked ? (n===10?"Mesurer":"Commencer") : "Verrouillé"}
+        ${unlocked ? "Commencer" : "Verrouillé"}
       </button>`;
     grid.appendChild(card);
   });
-  grid.querySelectorAll("[data-level]").forEach(btn=>{
-    btn.addEventListener("click",()=>startLearning(Number(btn.dataset.level)));
-  });
+  grid.querySelectorAll("[data-level]").forEach(btn=>btn.addEventListener("click",()=>startLearning(Number(btn.dataset.level))));
 }
 
+const fingerClass={
+  a:"finger-left-pinky",q:"finger-left-pinky",w:"finger-left-ring",s:"finger-left-ring",x:"finger-left-ring",
+  e:"finger-left-middle",d:"finger-left-middle",c:"finger-left-middle",r:"finger-left-index",f:"finger-left-index",v:"finger-left-index",t:"finger-left-index",g:"finger-left-index",
+  y:"finger-right-index",h:"finger-right-index",b:"finger-right-index",n:"finger-right-index",u:"finger-right-index",j:"finger-right-index",m:"finger-right-index",
+  i:"finger-right-middle",k:"finger-right-middle",o:"finger-right-ring",l:"finger-right-ring",p:"finger-right-pinky",z:"finger-left-pinky", " ":""
+};
 function buildKeyboard(){
   const rows=["AZERTYUIOP","QSDFGHJKLM","WXCVBN"];
-  $("keyboard").innerHTML=rows.map(row=>`
-    <div class="key-row">${[...row].map(k=>`<div class="key" data-key="${k.toLowerCase()}">${k}</div>`).join("")}</div>
-  `).join("") + `<div class="key-row"><div class="key space" data-key=" ">ESPACE</div></div>`;
+  $("keyboard").innerHTML=rows.map(row=>`<div class="key-row">${[...row].map(k=>`<div class="key ${fingerClass[k.toLowerCase()]||""}" data-key="${k.toLowerCase()}">${k}</div>`).join("")}</div>`).join("")+
+    `<div class="key-row"><div class="key space" data-key=" ">ESPACE</div></div>`;
 }
-
-function startLearning(level){
+function startLearning(level, exerciseIndex=0){
   currentLevel=level;
+  currentExercise=exerciseIndex;
   const data=levels[level-1];
-  levelStart=data.text;
-  $("exerciseTitle").textContent=`Exercice ${level}/10 — ${data.title}`;
+  levelStart=data.exercises[currentExercise];
+  $("exerciseTitle").textContent=`Niveau ${level}/10 — ${data.title}`;
   $("exerciseSubtitle").textContent=data.desc;
-  $("exerciseInstruction").textContent=level===10
-    ?"Le test final dure 60 secondes."
-    :`Recopie le texte ci-dessous avec au moins ${data.target} % de précision.`;
-  $("exerciseProgress").style.width=(level/10*100)+"%";
+  $("exerciseInstruction").textContent=`Recopie le texte ci-dessous. Objectif : ${data.target} % de précision minimum. Tu peux utiliser l'aide si tu bloques.`;
+  $("exerciseProgress").style.width=(((level-1)+(currentExercise+1)/data.exercises.length)/levels.length*100)+"%";
+  $("exerciseStep").textContent=`Exercice ${currentExercise+1} sur ${data.exercises.length}`;
   $("learningInput").value="";
   $("learningInput").disabled=false;
-  $("learningInput").focus();
+  $("learningInput").placeholder="Commence à recopier le texte affiché ci-dessus…";
+  $("learningAccuracy").textContent="0 %";
+  $("learningErrors").textContent="0";
+  $("learningCorrect").textContent="0";
+  $("learningGoal").textContent=data.target+" %";
   $("nextExercise").disabled=true;
-  $("learningInput").placeholder=levelStart;
+  $("nextExercise").textContent=currentExercise===2?(level===10?"Terminer →":"Valider le niveau →"):"Exercice suivant →";
   buildKeyboard();
+  renderLearningTarget("");
   showScreen("exercise");
+  $("learningInput").focus();
 }
-
+function renderLearningTarget(typed){
+  const target=$("learningTarget");
+  target.innerHTML="";
+  [...levelStart].forEach((ch,i)=>{
+    const span=document.createElement("span");
+    span.textContent=ch;
+    if(i<typed.length) span.className=typed[i]===ch?"typed-correct":"typed-wrong";
+    else if(i===typed.length) span.className="next-char";
+    target.appendChild(span);
+  });
+  [...document.querySelectorAll(".key")].forEach(k=>k.classList.remove("active"));
+  const next=levelStart[typed.length];
+  if(next!==undefined){
+    // Les accents pointent vers la touche de base correspondante sur le clavier visuel.
+    const baseKey=next.toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    const key=document.querySelector(`.key[data-key="${CSS.escape(baseKey)}"]`) ||
+      (next==="?"||next==="!"||next==="."||next===","||next==="'" ? document.querySelector('.key[data-key="m"]') : null);
+    if(key)key.classList.add("active");
+  }
+}
 function updateLearning(){
   const typed=$("learningInput").value;
-  let correct=0, errors=0;
+  let correct=0,errors=0;
   for(let i=0;i<typed.length;i++){
-    if(i<levelStart.length && typed[i]===levelStart[i]) correct++;
-    else errors++;
+    if(i<levelStart.length&&typed[i]===levelStart[i])correct++;else errors++;
   }
-  const accuracy=typed.length ? correct/typed.length*100 : 0;
+  const accuracy=typed.length?correct/typed.length*100:0;
   $("learningAccuracy").textContent=accuracy.toFixed(1)+" %";
   $("learningErrors").textContent=errors;
   $("learningCorrect").textContent=correct;
-  $("nextExercise").disabled=!(typed.length>=levelStart.length && accuracy>=levels[currentLevel-1].target);
-  [...document.querySelectorAll(".key")].forEach(k=>k.classList.remove("active"));
-  const next=levelStart[typed.length];
-  if(next){
-    const key=document.querySelector(`.key[data-key="${CSS.escape(next.toLowerCase())}"]`);
-    if(key) key.classList.add("active");
-  }
+  const done=typed.length===levelStart.length && typed===levelStart && accuracy>=levels[currentLevel-1].target;
+  $("nextExercise").disabled=!done;
+  renderLearningTarget(typed);
 }
 $("learningInput").addEventListener("input",updateLearning);
 $("nextExercise").addEventListener("click",()=>{
+  const data=levels[currentLevel-1];
   const typed=$("learningInput").value;
+  if(typed!==levelStart)return;
   let correct=0;
-  for(let i=0;i<typed.length;i++) if(i<levelStart.length && typed[i]===levelStart[i]) correct++;
+  for(let i=0;i<typed.length;i++)if(typed[i]===levelStart[i])correct++;
   const acc=typed.length?correct/typed.length*100:0;
+  if(acc<data.target)return;
+  if(currentExercise<data.exercises.length-1){
+    startLearning(currentLevel,currentExercise+1);
+    return;
+  }
   localStorage.setItem("typingBestL"+currentLevel,Math.max(Number(localStorage.getItem("typingBestL"+currentLevel)||0),acc).toFixed(1));
-  if(currentLevel<10){
+  if(currentLevel<levels.length){
     unlockedLevel=Math.max(unlockedLevel,currentLevel+1);
-    localStorage.setItem("typingUnlocked",unlockedLevel);
+    localStorage.setItem("typingUnlocked",String(unlockedLevel));
     renderLevels();
     startLearning(currentLevel+1);
   }else{
-    startTypingTest();
+    $("exerciseInstruction").textContent="Bravo ! Tu as terminé les 10 niveaux et appris les bases de la frappe au clavier.";
+    $("learningInput").disabled=true;
+    $("nextExercise").disabled=true;
+    $("nextExercise").textContent="Niveaux terminés !";
+    $("backLearning").focus();
   }
 });
 $("helpButton").addEventListener("click",()=>{
-  alert("Regarde la touche mise en évidence sur le clavier. Prends ton temps : la précision est plus importante que la vitesse.");
+  const next=levelStart[$("learningInput").value.length]||"fin de la phrase";
+  let advice="Regarde la touche mise en évidence. Tape doucement et garde les poignets détendus.";
+  if(currentLevel===2||currentLevel===3)advice+=" Pose tes doigts sur la rangée de repos : A, S, D, F à gauche et J, K, L, M à droite. Les index reviennent près de F et J.";
+  if(currentLevel>=6)advice+=" Pour écrire une majuscule, maintiens Maj (Shift). Sur un clavier français, les accents et signes peuvent demander une combinaison de touches.";
+  alert(advice+"\n\nProchaine touche attendue : "+next);
 });
 
 // ---------- TEST 1 MINUTE ----------
