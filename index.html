@@ -313,6 +313,7 @@ let unlockedLevel = Number(localStorage.getItem("typingUnlocked") || 1);
 let currentLevel = 1;
 let currentExercise = 0;
 let levelStart = "";
+let exerciseAdvancePending = false;
 
 function renderLevels(){
   const grid = $("levelGrid");
@@ -348,6 +349,7 @@ function buildKeyboard(){
     `<div class="key-row"><div class="key space" data-key=" ">ESPACE</div></div>`;
 }
 function startLearning(level, exerciseIndex=0){
+  exerciseAdvancePending=false;
   currentLevel=level;
   currentExercise=exerciseIndex;
   const data=levels[level-1];
@@ -402,8 +404,15 @@ function updateLearning(){
   $("learningErrors").textContent=errors;
   $("learningCorrect").textContent=correct;
   const done=typed.length===levelStart.length && typed===levelStart && accuracy>=levels[currentLevel-1].target;
-  $("nextExercise").disabled=!done;
+  $("nextExercise").disabled=!done || exerciseAdvancePending;
   renderLearningTarget(typed);
+  // Passe automatiquement à l'exercice suivant lorsque la saisie est parfaite.
+  if(done && !exerciseAdvancePending){
+    exerciseAdvancePending=true;
+    $("learningInput").disabled=true;
+    $("nextExercise").disabled=false;
+    setTimeout(()=>$("nextExercise").click(),300);
+  }
 }
 $("learningInput").addEventListener("input",updateLearning);
 $("nextExercise").addEventListener("click",()=>{
