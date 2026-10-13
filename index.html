@@ -220,8 +220,8 @@ footer{text-align:center;color:var(--muted);padding:25px}
     <div class="progress"><div id="exerciseProgress"></div></div>
     <div class="instruction" id="exerciseInstruction"></div>
     <div class="exercise-step" id="exerciseStep">Exercice 1 sur 3</div>
-    <div class="learning-target" id="learningTarget" aria-label="Texte à recopier"></div>
     <div class="keyboard" id="keyboard"></div>
+    <div class="learning-target" id="learningTarget" aria-label="Texte à recopier"></div>
     <div class="finger-guide" id="fingerGuide">
       <span>🩷 Auriculaire gauche</span><span>🔵 Annulaire gauche</span><span>🟢 Majeur gauche</span><span>🟡 Index gauche</span><span>🟠 Index droit</span><span>🟣 Majeur droit</span><span>🔴 Annulaire droit</span><span>⚪ Auriculaire droit</span><span>👍 Pouce : espace</span>
     </div>
@@ -303,7 +303,7 @@ const screens = {
 function showScreen(name){
   Object.values(screens).forEach(s => s.classList.remove("active"));
   screens[name].classList.add("active");
-  window.scrollTo({top:0, behavior:"smooth"});
+  window.scrollTo({top:0, left:0, behavior:"auto"});
 }
 
 // ---------- APPRENTISSAGE ----------
@@ -430,7 +430,7 @@ function startLearning(level, exerciseIndex=0){
   renderSmartTraining();
   $("nextFinger").textContent=getExpectedFinger(levelStart[0]||"");
   showScreen("exercise");
-  $("learningInput").focus();
+  $("learningInput").focus({preventScroll:true});
 }
 function renderLearningTarget(typed){
   const target=$("learningTarget");
@@ -536,7 +536,7 @@ function startTargetedTraining(){
   $("learningAccuracy").textContent="0 %";$("learningErrors").textContent="0";$("learningCorrect").textContent="0";$("learningGoal").textContent=levels[currentLevel-1].target+" %";
   $("nextExercise").disabled=true;$("nextExercise").textContent="Terminer l'entraînement →";
   buildKeyboard();renderLearningTarget("");$("nextFinger").textContent=getExpectedFinger(levelStart[0]||"");
-  showScreen("exercise");$("learningInput").focus();
+  showScreen("exercise");$("learningInput").focus({preventScroll:true});
 }
 $("targetedTrainingButton").addEventListener("click",startTargetedTraining);
 $("helpButton").addEventListener("click",()=>{
