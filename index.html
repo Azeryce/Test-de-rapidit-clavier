@@ -115,6 +115,13 @@ p{line-height:1.6}
 .learning-target .typed-correct{color:#16845b;background:#e0f7ec;border-radius:3px}
 .learning-target .typed-wrong{color:#b42323;background:#ffe4e4;border-radius:3px}
 .learning-target .next-char{outline:2px solid var(--primary);outline-offset:2px;border-radius:3px;color:var(--text)}
+.hands-help{display:flex;align-items:center;justify-content:center;gap:clamp(18px,5vw,58px);flex-wrap:wrap;margin:18px auto 8px;padding:18px;background:var(--panel2);border:1px solid var(--border);border-radius:18px;text-align:center}
+.hand-card{display:flex;align-items:center;gap:12px;min-width:190px;justify-content:center}
+.hand-emoji{width:94px;height:100px;flex:0 0 auto;filter:drop-shadow(0 3px 2px rgba(0,0,0,.12))}.hand-emoji svg{display:block;width:100%;height:100%;overflow:visible}.hand-palm{fill:#f4c7a1;stroke:#805b48;stroke-width:2.5;stroke-linejoin:round}.hand-finger{stroke:#805b48;stroke-width:2.5;stroke-linejoin:round}.hand-thumb{fill:#f4c7a1;stroke:#805b48;stroke-width:2.5;stroke-linejoin:round}
+.hand-label{font-weight:800;color:var(--text);text-align:left}
+.hand-label small{display:block;margin-top:4px;font-weight:600;color:var(--muted);line-height:1.5}
+.hand-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+@media(max-width:520px){.hands-help{gap:14px;padding:14px}.hand-card{min-width:145px;gap:8px}.hand-emoji{width:72px;height:82px}.hand-label{font-size:.9rem}}
 .keyboard{margin:24px auto;max-width:900px}
 .key small{font-size:.55rem;font-weight:600;opacity:.8}
 .key.finger-left-pinky{border-bottom:4px solid #e879f9}.key.finger-left-ring{border-bottom:4px solid #60a5fa}.key.finger-left-middle{border-bottom:4px solid #34d399}.key.finger-left-index{border-bottom:4px solid #fbbf24}.key.finger-right-index{border-bottom:4px solid #fb923c}.key.finger-right-middle{border-bottom:4px solid #a78bfa}.key.finger-right-ring{border-bottom:4px solid #f87171}.key.finger-right-pinky{border-bottom:4px solid #94a3b8}
@@ -220,10 +227,14 @@ footer{text-align:center;color:var(--muted);padding:25px}
     <div class="progress"><div id="exerciseProgress"></div></div>
     <div class="instruction" id="exerciseInstruction"></div>
     <div class="exercise-step" id="exerciseStep">Exercice 1 sur 3</div>
+    <div class="hands-help" aria-label="Position des mains sur le clavier">
+      <div class="hand-card"><span class="hand-emoji" aria-hidden="true"><svg viewBox="0 0 100 110" role="img" aria-label="Main gauche avec les doigts colorés"><path class="hand-palm" d="M9 57 Q9 48 18 51 L27 59 L27 49 Q27 43 35 44 L45 50 L45 44 Q45 38 53 40 L63 49 L63 43 Q63 37 71 41 L83 53 Q88 59 85 70 L78 92 Q75 101 64 101 L31 101 Q20 101 17 91 L8 70 Q5 62 9 57Z"/><rect class="hand-finger" x="9" y="18" width="16" height="49" rx="8" fill="#e879f9"/><rect class="hand-finger" x="27" y="8" width="16" height="58" rx="8" fill="#60a5fa"/><rect class="hand-finger" x="45" y="3" width="16" height="63" rx="8" fill="#34d399"/><rect class="hand-finger" x="63" y="15" width="16" height="52" rx="8" fill="#fbbf24"/><path d="M27 76 Q48 83 72 75" fill="none" stroke="#805b48" stroke-width="2" stroke-linecap="round"/></svg></span><div class="hand-label">Main gauche<small><span class="hand-dot" style="background:#e879f9"></span>A · <span class="hand-dot" style="background:#60a5fa"></span>S · <span class="hand-dot" style="background:#34d399"></span>D · <span class="hand-dot" style="background:#fbbf24"></span>F</small><small>Doigts sur <strong>A S D F</strong></small></div></div>
+      <div class="hand-card"><span class="hand-emoji" aria-hidden="true"><svg viewBox="0 0 100 110" role="img" aria-label="Main droite avec les doigts colorés"><path class="hand-palm" d="M21 49 L31 43 Q39 38 39 45 L39 50 L49 40 Q57 36 57 44 L57 50 L67 43 Q75 40 75 48 L75 59 L83 51 Q91 47 94 55 Q97 61 92 70 L83 91 Q80 101 69 101 L36 101 Q25 101 22 92 L15 70 Q12 59 21 49Z"/><rect class="hand-finger" x="21" y="15" width="16" height="52" rx="8" fill="#fb923c"/><rect class="hand-finger" x="39" y="3" width="16" height="64" rx="8" fill="#a78bfa"/><rect class="hand-finger" x="57" y="8" width="16" height="58" rx="8" fill="#f87171"/><rect class="hand-finger" x="75" y="18" width="16" height="49" rx="8" fill="#94a3b8"/><path d="M28 76 Q51 83 74 75" fill="none" stroke="#805b48" stroke-width="2" stroke-linecap="round"/></svg></span><div class="hand-label">Main droite<small><span class="hand-dot" style="background:#fb923c"></span>J · <span class="hand-dot" style="background:#a78bfa"></span>K · <span class="hand-dot" style="background:#f87171"></span>L · <span class="hand-dot" style="background:#94a3b8"></span>M</small></div></div>
+    </div>
     <div class="keyboard" id="keyboard"></div>
     <div class="learning-target" id="learningTarget" aria-label="Texte à recopier"></div>
     <div class="finger-guide" id="fingerGuide">
-      <span>🩷 Auriculaire gauche</span><span>🔵 Annulaire gauche</span><span>🟢 Majeur gauche</span><span>🟡 Index gauche</span><span>🟠 Index droit</span><span>🟣 Majeur droit</span><span>🔴 Annulaire droit</span><span>⚪ Auriculaire droit</span><span>👍 Pouce : espace</span>
+      <span>🩷 Auriculaire gauche</span><span>🔵 Annulaire gauche</span><span>🟢 Majeur gauche</span><span>🟡 Index gauche</span><span>🟠 Index droit</span><span>🟣 Majeur droit</span><span>🔴 Annulaire droit</span><span>⚪ Auriculaire droit</span>
     </div>
     <div class="next-finger" id="nextFinger" aria-live="polite">Doigt conseillé : regarde la touche mise en évidence.</div>
     <textarea id="learningInput" placeholder="Écris ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
