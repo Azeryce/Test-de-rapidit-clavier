@@ -218,15 +218,20 @@ textarea{background:#fff;border-radius:12px;min-height:100px}
 
 
 .approved-hands{position:relative!important;inset:auto!important;display:flex!important;justify-content:center!important;align-items:center!important;margin:8px auto 0!important;pointer-events:none!important;height:auto!important;background:transparent!important}
-.approved-hands img{display:block;width:min(680px,96%);height:auto;object-fit:contain}.approved-hands{margin:10px auto 0!important}.natural-hands{filter:drop-shadow(0 3px 3px rgba(30,41,59,.08))}
-@media(max-width:650px){.approved-hands img{width:min(440px,98%)}}
+.approved-hands img{display:block;width:min(430px,62%);max-height:190px;height:auto;object-fit:contain;margin:0 auto}.approved-hands{margin:2px auto 0!important}.natural-hands{filter:drop-shadow(0 3px 3px rgba(30,41,59,.08))}
+@media(max-width:650px){.approved-hands img{width:min(300px,68%);max-height:135px}}
+
+.header-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+.site-return-link{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:10px;background:#fff;color:#243b70;text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid #d8e2fa;transition:transform .15s,background .15s}
+.site-return-link:hover{background:#eef2ff;transform:translateY(-1px)}
+@media(max-width:650px){.header-actions{gap:6px}.site-return-link{font-size:.78rem;padding:7px 9px}}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
   <div class="logo">⌨️ Test de rapidité clavier</div>
-  <div class="badge">Apprendre • S'entraîner • Progresser</div>
+  <div class="header-actions"><a class="site-return-link" href="https://monguidenumerique.lovable.app/accueil" target="_blank" rel="noopener noreferrer" aria-label="Retourner sur Mon Guide Numérique">↗ Mon Guide Numérique</a><div class="badge">Apprendre • S'entraîner • Progresser</div></div>
 </header>
 
 <main>
@@ -536,11 +541,11 @@ function updateLearning(){
   $("learningAccuracy").textContent=accuracy.toFixed(1)+" %";
   $("learningErrors").textContent=errors;
   $("learningCorrect").textContent=correct;
-  const done=typed.length===levelStart.length && typed===levelStart && accuracy>=levels[currentLevel-1].target;
+  const done=typed.length>=levelStart.length; // Les erreurs restent visibles en rouge, mais ne bloquent pas la progression.
   $("nextExercise").disabled=!done || exerciseAdvancePending;
   renderLearningTarget(typed);
   $("nextFinger").textContent=typed.length<levelStart.length?getExpectedFinger(levelStart[typed.length]):"✅ Parfait ! Prépare-toi pour la suite…";
-  // Passe automatiquement à l'exercice suivant lorsque la saisie est parfaite.
+  // Passe automatiquement à la suite dès que tous les caractères ont été tentés, même avec des erreurs.
   if(done && !exerciseAdvancePending){
     exerciseAdvancePending=true;
     $("learningInput").disabled=true;
@@ -548,7 +553,11 @@ function updateLearning(){
     setTimeout(()=>$("nextExercise").click(),300);
   }
 }
-$("learningInput").addEventListener("input",updateLearning);
+$("learningInput").addEventListener("input",()=>{
+  const fixedScrollY=window.scrollY;
+  updateLearning();
+  requestAnimationFrame(()=>{ if(document.activeElement===$("learningInput") && Math.abs(window.scrollY-fixedScrollY)>2) window.scrollTo({top:fixedScrollY,left:0,behavior:"auto"}); });
+});
 $("nextExercise").addEventListener("click",()=>{
   const data=levels[currentLevel-1];
   const typed=$("learningInput").value;
