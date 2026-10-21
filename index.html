@@ -837,25 +837,29 @@ function updateBestSpeed(candidate=null){
 function calculateTestResults(){
   const typed=$("typingInput").value;
   let currentCorrect=0;
-  for(let i=0;i<typed.length;i++){
-    if(i<expectedText.length && typed[i]===expectedText[i]) currentCorrect++;
+  for(let i=0;i<typed.length && i<expectedText.length;i++){
+    if(typed[i]===expectedText[i]) currentCorrect++;
   }
 
-  // Les caractères validés dans les phrases terminées sont ajoutés une seule fois.
-  const correctCharacters=completedCharacters+currentCorrect;
-  // La précision porte sur les frappes réellement tentées : une erreur corrigée
-  // reste comptée dans les erreurs, sans être comptée comme caractère correct.
-  const attempts=Math.max(0,totalCharactersEntered);
-  const accuracy=attempts>0?Math.max(0,Math.min(100,((attempts-totalTypingErrors)/attempts)*100)):0;
-  return {total:attempts,correct:correctCharacters,errors:totalTypingErrors,accuracy};
+  // Chaque phrase terminée est comptée une seule fois; on ajoute les caractères
+  // corrects de la phrase en cours sans compter les caractères au-delà du texte.
+  const correctCharacters=Math.max(0,completedCharacters+currentCorrect);
+  const attempts=Math.max(0,Number(totalCharactersEntered)||0);
+  const errors=Math.max(0,Math.min(attempts,Number(totalTypingErrors)||0));
+  // Les erreurs corrigées restent des erreurs commises, donc la précision ne remonte pas.
+  const accuracy=attempts>0?Math.max(0,Math.min(100,((attempts-errors)/attempts)*100)):0;
+  return {total:attempts,correct:correctCharacters,errors,accuracy};
 }
 
 function calculateNetMPM(results,elapsedSeconds){
-  // Convention stable : 1 mot = 5 caractères correctement saisis.
-  // Le chronomètre démarre à la première frappe, pas au chargement de la page.
-  const safeSeconds=Math.max(0,Math.min(TEST_DURATION,Number(elapsedSeconds)||0));
+  // MPM net = caractères correctement saisis / 5 / minutes écoulées.
+  // La durée est bornée entre 0 et 60 secondes; une durée nulle donne 0, jamais Infinity.
+  const rawSeconds=Number(elapsedSeconds);
+  const safeSeconds=Number.isFinite(rawSeconds)?Math.max(0,Math.min(TEST_DURATION,rawSeconds)):0;
+  const correct=Number.isFinite(Number(results && results.correct))?Math.max(0,Number(results.correct)):0;
   if(safeSeconds<=0)return 0;
-  return (results.correct/5)/(safeSeconds/60);
+  const value=(correct/5)/(safeSeconds/60);
+  return Number.isFinite(value)?value:0;
 }
 
 function displayTestResults(results,seconds){
@@ -885,9 +889,10 @@ function finishTest(){
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
   $("typingInput").disabled=true;
   $("typingInput").readOnly=true;
+  const elapsedSeconds=startTime===null?0:Math.max(0,Math.min(TEST_DURATION,(Date.now()-startTime)/1000));
   const results=calculateTestResults();
-  displayTestResults(results,TEST_DURATION);
-  const netMPM=calculateNetMPM(results,TEST_DURATION);
+  displayTestResults(results,elapsedSeconds);
+  const netMPM=calculateNetMPM(results,elapsedSeconds);
   $("finalNetSpeed").textContent=netMPM.toFixed(1)+" MPM";
   $("finalAccuracy").textContent=results.accuracy.toFixed(1)+" %";
   $("finalErrors").textContent=results.errors;
@@ -945,6 +950,7 @@ function resetTest(goToTest=true){
   $("resetButton").textContent="Réinitialisation...";
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
   startTime=null;
+  completedCharacters=0;
   totalCharactersEntered=0;
   totalTypingErrors=0;
   lastInputValue="";
