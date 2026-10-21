@@ -238,6 +238,16 @@ textarea{background:#fff;border-radius:12px;min-height:100px}
 </style>
 
 <style id="stable-exercise-layout-v2">
+/* Retour visuel en direct pendant le test de vitesse. */
+.typing-target{font-size:1.2rem;line-height:1.95;background:var(--surface,#f7f8ff);border:1px solid var(--border,#dce3f5);border-radius:16px;padding:20px;overflow-wrap:anywhere;white-space:pre-wrap;min-height:84px;color:var(--text,#24324f)}
+.typing-target .test-char{border-radius:3px;white-space:pre}
+.typing-target .test-char-correct{color:#16834a;background:rgba(34,197,94,.12)}
+.typing-target .test-char-error{color:#b42318;background:rgba(239,68,68,.17);text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:#dc2626}
+.typing-target .test-char-current{border-left:2px solid var(--primary,#5b5bd6);background:rgba(99,102,241,.17);animation:typingCaretPulse 1s steps(2,start) infinite}
+.typing-target .test-char-current.test-char-error{border-left-color:#dc2626}
+.typing-progress{margin:-8px 0 14px;font-size:.92rem;color:var(--muted,#65708a);min-height:1.4em}
+@keyframes typingCaretPulse{to{border-left-color:transparent}}
+@media(prefers-reduced-motion:reduce){.typing-target .test-char-current{animation:none}}
 /* Zone de frappe stable : elle ne dépend plus du défilement de la page. */
 #exerciseScreen .exercise{padding-bottom:260px!important;}
 #exerciseScreen .learning-target{
@@ -372,14 +382,14 @@ textarea{background:#fff;border-radius:12px;min-height:100px}
       <span>Temps restant</span>
       <strong id="timeLeft">60 s</strong>
     </div>
-    <p id="testText" style="font-size:1.2rem;line-height:1.8;background:#f7f8ff;border-radius:16px;padding:20px"></p>
-    <textarea id="typingInput" placeholder="Clique ici et commence à écrire..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    <p id="testText" class="typing-target" aria-label="Texte à recopier" aria-live="off"></p>
+    <div id="typingProgress" class="typing-progress" role="status" aria-live="polite">La progression de ta frappe apparaîtra ici.</div>
+    <label class="sr-only" for="typingInput">Recopie le texte affiché au-dessus</label>
+    <textarea id="typingInput" aria-describedby="typingProgress" placeholder="Clique ici et commence à écrire..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div class="stats">
-      <div class="stat"><span>Vitesse</span><strong><span id="speed" style="display:inline;color:inherit;font-size:inherit">0.0</span> MPM</strong></div>
-      <div class="stat"><span>Vitesse nette</span><strong><span id="netSpeed" style="display:inline;color:inherit;font-size:inherit">0.0</span> MPM</strong></div>
+      <div class="stat"><span>MPM net</span><strong><span id="netSpeed" style="display:inline;color:inherit;font-size:inherit">0.0</span></strong></div>
       <div class="stat"><span>Précision</span><strong><span id="accuracy" style="display:inline;color:inherit;font-size:inherit">0.0</span> %</strong></div>
       <div class="stat"><span>Erreurs</span><strong id="errors">0</strong></div>
-      <div class="stat"><span>Record personnel</span><strong id="bestSpeed">0.0 MPM</strong></div>
     </div>
   </div>
 </section>
@@ -390,8 +400,7 @@ textarea{background:#fff;border-radius:12px;min-height:100px}
     <h2>Test terminé !</h2>
     <p style="color:var(--muted)">Voici tes résultats pour la minute.</p>
     <div class="final-grid">
-      <div class="stat"><span>Vitesse</span><strong id="finalSpeed">0.0 MPM</strong></div>
-      <div class="stat"><span>Vitesse nette</span><strong id="finalNetSpeed">0.0 MPM</strong></div>
+      <div class="stat"><span>MPM net</span><strong id="finalNetSpeed">0.0</strong></div>
       <div class="stat"><span>Précision</span><strong id="finalAccuracy">0.0 %</strong></div>
       <div class="stat"><span>Erreurs</span><strong id="finalErrors">0</strong></div>
     </div>
@@ -711,6 +720,9 @@ $("helpButton").addEventListener("click",()=>{
 let expectedText="";
 let phraseQueue=[];
 let completedCharacters=0;
+let totalCharactersEntered=0;
+let totalTypingErrors=0;
+let lastInputValue="";
 let startTime=null;
 let timerInterval=null;
 let testFinished=false;
@@ -758,15 +770,50 @@ function shuffleTestPhrases(){
   }
 }
 
+function renderTypingProgress(){
+  const typed=$("typingInput").value;
+  const target=$("testText");
+  const fragment=document.createDocumentFragment();
+  for(let i=0;i<expectedText.length;i++){
+    const span=document.createElement("span");
+    span.className="test-char";
+    // Un caractère saisi correctement passe en vert, une erreur en rouge,
+    // et la prochaine position est indiquée par un curseur visible.
+    if(i<typed.length){
+      if(typed[i]===expectedText[i]) span.classList.add("test-char-correct");
+      else span.classList.add("test-char-error");
+    }
+    if(i===typed.length) span.classList.add("test-char-current");
+    span.textContent=expectedText[i]===" "?"\u00a0":expectedText[i];
+    fragment.appendChild(span);
+  }
+  if(typed.length>expectedText.length){
+    for(let i=expectedText.length;i<typed.length;i++){
+      const extra=document.createElement("span");
+      extra.className="test-char test-char-error";
+      extra.textContent=typed[i];
+      fragment.appendChild(extra);
+    }
+  }
+  target.replaceChildren(fragment);
+  const correct=Array.from(typed).reduce((n,ch,i)=>n+(i<expectedText.length&&ch===expectedText[i]?1:0),0);
+  const mistakes=Array.from(typed).reduce((n,ch,i)=>n+(i>=expectedText.length||ch!==expectedText[i]?1:0),0);
+  $("typingProgress").textContent=`Progression : ${Math.min(typed.length,expectedText.length)} / ${expectedText.length} caractères • ${correct} correct(s) • ${mistakes} erreur(s)`;
+}
+
 function showNextTestPhrase(){
   if(phraseQueue.length===0) shuffleTestPhrases();
   expectedText=phraseQueue.shift();
-  $("testText").textContent=expectedText;
   $("typingInput").value="";
+  lastInputValue="";
+  renderTypingProgress();
 } 
 
 function chooseTestText(){
   completedCharacters=0;
+  totalCharactersEntered=0;
+  totalTypingErrors=0;
+  lastInputValue="";
   shuffleTestPhrases();
   showNextTestPhrase();
 }
@@ -782,7 +829,6 @@ function startTypingTest(){
 function updateBestSpeed(candidate=null){
   const saved=Number(localStorage.getItem("typingMinuteBestSpeed") || 0);
   const best=Math.max(saved, Number(candidate || 0));
-  $("bestSpeed").textContent=best.toFixed(1)+" MPM";
   if(candidate!==null && Number(candidate)>saved){
     localStorage.setItem("typingMinuteBestSpeed", Number(candidate).toFixed(1));
   }
@@ -790,22 +836,30 @@ function updateBestSpeed(candidate=null){
 
 function calculateTestResults(){
   const typed=$("typingInput").value;
-  let currentCorrect=0, errors=0;
+  let currentCorrect=0;
   for(let i=0;i<typed.length;i++){
     if(i<expectedText.length && typed[i]===expectedText[i]) currentCorrect++;
-    else errors++;
   }
-  const total=completedCharacters+typed.length;
-  const correct=completedCharacters+currentCorrect;
-  const accuracy=total?correct/total*100:0;
-  return {total,correct,errors,accuracy};
+
+  // Les caractères validés dans les phrases terminées sont ajoutés une seule fois.
+  const correctCharacters=completedCharacters+currentCorrect;
+  // La précision porte sur les frappes réellement tentées : une erreur corrigée
+  // reste comptée dans les erreurs, sans être comptée comme caractère correct.
+  const attempts=Math.max(0,totalCharactersEntered);
+  const accuracy=attempts>0?Math.max(0,Math.min(100,((attempts-totalTypingErrors)/attempts)*100)):0;
+  return {total:attempts,correct:correctCharacters,errors:totalTypingErrors,accuracy};
+}
+
+function calculateNetMPM(results,elapsedSeconds){
+  // Convention stable : 1 mot = 5 caractères correctement saisis.
+  // Le chronomètre démarre à la première frappe, pas au chargement de la page.
+  const safeSeconds=Math.max(0,Math.min(TEST_DURATION,Number(elapsedSeconds)||0));
+  if(safeSeconds<=0)return 0;
+  return (results.correct/5)/(safeSeconds/60);
 }
 
 function displayTestResults(results,seconds){
-  const minutes=seconds/60;
-  const wpm=minutes>0?results.total/5/minutes:0;
-  const net=minutes>0?results.correct/5/minutes:0;
-  $("speed").textContent=wpm.toFixed(1);
+  const net=calculateNetMPM(results,seconds);
   $("netSpeed").textContent=net.toFixed(1);
   $("accuracy").textContent=results.accuracy.toFixed(1);
   $("errors").textContent=results.errors;
@@ -833,11 +887,11 @@ function finishTest(){
   $("typingInput").readOnly=true;
   const results=calculateTestResults();
   displayTestResults(results,TEST_DURATION);
-  $("finalSpeed").textContent=(results.total/5).toFixed(1)+" MPM";
-  $("finalNetSpeed").textContent=(results.correct/5).toFixed(1)+" MPM";
+  const netMPM=calculateNetMPM(results,TEST_DURATION);
+  $("finalNetSpeed").textContent=netMPM.toFixed(1)+" MPM";
   $("finalAccuracy").textContent=results.accuracy.toFixed(1)+" %";
   $("finalErrors").textContent=results.errors;
-  updateBestSpeed(results.total/5);
+  updateBestSpeed(netMPM);
   const v=$("validation");
   v.textContent=results.accuracy>=90 && results.total>0?"Validé":"Non validé";
   v.className="validation "+(results.accuracy>=90&&results.total>0?"ok":"no");
@@ -852,13 +906,32 @@ function preventModification(e){
 }
 ["keydown","paste","cut","drop","beforeinput"].forEach(evt=>$("typingInput").addEventListener(evt,preventModification));
 
-$("typingInput").addEventListener("input",()=>{
+$("typingInput").addEventListener("input",(event)=>{
   if(testFinished||isResetting)return;
-  if(startTime===null && $("typingInput").value.length>0){
+  const field=$("typingInput");
+  const currentValue=field.value;
+  if(startTime===null && currentValue.length>0){
     startTime=Date.now();
     timerInterval=setInterval(updateTimer,100);
   }
-  if($("typingInput").value===expectedText){
+  // Compte les caractères réellement saisis, y compris ceux ensuite effacés.
+  // Une correction ne fait donc pas disparaître une erreur déjà commise.
+  if(event.inputType && event.inputType.startsWith("insert")){
+    let inserted=typeof event.data==="string"?event.data:"";
+    if(!inserted){
+      let prefix=0;
+      while(prefix<lastInputValue.length && prefix<currentValue.length && lastInputValue[prefix]===currentValue[prefix])prefix++;
+      inserted=currentValue.slice(prefix,Math.max(prefix,currentValue.length-(lastInputValue.length-prefix)));
+    }
+    const caret=Math.max(0,(field.selectionStart||currentValue.length)-inserted.length);
+    totalCharactersEntered+=inserted.length;
+    for(let i=0;i<inserted.length;i++){
+      if(expectedText[caret+i]!==inserted[i]) totalTypingErrors++;
+    }
+  }
+  lastInputValue=currentValue;
+  renderTypingProgress();
+  if(currentValue===expectedText){
     completedCharacters+=expectedText.length;
     showNextTestPhrase();
   }
@@ -872,12 +945,15 @@ function resetTest(goToTest=true){
   $("resetButton").textContent="Réinitialisation...";
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
   startTime=null;
+  totalCharactersEntered=0;
+  totalTypingErrors=0;
+  lastInputValue="";
   testFinished=false;
   $("typingInput").disabled=false;
   $("typingInput").readOnly=false;
   $("typingInput").value="";
+  renderTypingProgress();
   $("timeLeft").textContent="60 s";
-  $("speed").textContent="0.0";
   $("netSpeed").textContent="0.0";
   $("accuracy").textContent="0.0";
   $("errors").textContent="0";
