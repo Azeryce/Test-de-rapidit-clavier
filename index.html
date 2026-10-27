@@ -238,16 +238,20 @@ textarea{background:#fff;border-radius:12px;min-height:100px}
 </style>
 
 <style id="stable-exercise-layout-v2">
-/* Retour visuel en direct pendant le test de vitesse. */
-.typing-target{font-size:1.2rem;line-height:1.95;background:var(--surface,#f7f8ff);border:1px solid var(--border,#dce3f5);border-radius:16px;padding:20px;overflow-wrap:anywhere;white-space:pre-wrap;min-height:84px;color:var(--text,#24324f)}
-.typing-target .test-char{border-radius:3px;white-space:pre}
-.typing-target .test-char-correct{color:#16834a;background:rgba(34,197,94,.12)}
-.typing-target .test-char-error{color:#b42318;background:rgba(239,68,68,.17);text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:#dc2626}
-.typing-target .test-char-current{border-left:2px solid var(--primary,#5b5bd6);background:rgba(99,102,241,.17);animation:typingCaretPulse 1s steps(2,start) infinite}
+/* Retour visuel renforcé en direct pendant le test de vitesse. */
+.typing-target{font-size:1.2rem;line-height:1.95;background:var(--surface,#f7f8ff);border:1px solid var(--border,#dce3f5);border-radius:16px;padding:20px;overflow-wrap:anywhere;white-space:pre-wrap;min-height:84px;color:var(--text,#24324f);scroll-margin:16px}
+.typing-target .test-char{border-radius:3px;white-space:pre;transition:color .08s,background-color .08s}
+.typing-target .test-char-correct{color:#16834a;background:rgba(34,197,94,.16)}
+.typing-target .test-char-error{color:#b42318;background:rgba(239,68,68,.20);text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:#dc2626}
+.typing-target .test-char-current{border-left:3px solid #7c3aed;border-radius:2px 4px 4px 2px;background:rgba(124,58,237,.19);box-shadow:inset 0 -2px 0 rgba(124,58,237,.25);animation:typingCaretPulse 1s steps(2,start) infinite}
 .typing-target .test-char-current.test-char-error{border-left-color:#dc2626}
-.typing-progress{margin:-8px 0 14px;font-size:.92rem;color:var(--muted,#65708a);min-height:1.4em}
+.typing-feedback{display:grid;grid-template-columns:1fr;gap:12px;align-items:center;margin:-4px 0 14px}
+.typing-progress{margin:0;font-size:.92rem;color:var(--muted,#65708a);min-height:1.4em}
+.typing-progress-track{height:7px;margin:-5px 0 14px;border-radius:999px;background:var(--border,#dce3f5);overflow:hidden}
+.typing-progress-fill{height:100%;width:0;background:linear-gradient(90deg,#7c3aed,#22c55e);border-radius:inherit;transition:width .12s linear}
 @keyframes typingCaretPulse{to{border-left-color:transparent}}
-@media(prefers-reduced-motion:reduce){.typing-target .test-char-current{animation:none}}
+@media(max-width:560px){.typing-target{font-size:1.05rem;padding:14px;line-height:1.8}.typing-feedback{grid-template-columns:1fr;gap:5px}.typing-progress-track{margin-top:0}}
+@media(prefers-reduced-motion:reduce){.typing-target .test-char-current{animation:none}.typing-progress-fill,.typing-target .test-char{transition:none}}
 /* Zone de frappe stable : elle ne dépend plus du défilement de la page. */
 #exerciseScreen .exercise{padding-bottom:260px!important;}
 #exerciseScreen .learning-target{
@@ -383,7 +387,10 @@ textarea{background:#fff;border-radius:12px;min-height:100px}
       <strong id="timeLeft">60 s</strong>
     </div>
     <p id="testText" class="typing-target" aria-label="Texte à recopier" aria-live="off"></p>
-    <div id="typingProgress" class="typing-progress" role="status" aria-live="polite">La progression de ta frappe apparaîtra ici.</div>
+    <div class="typing-feedback">
+      <div id="typingProgress" class="typing-progress" role="status" aria-live="polite">Progression : 0 % • 0 caractère correct • 0 erreur</div>
+    </div>
+    <div class="typing-progress-track" role="progressbar" aria-label="Progression de la phrase" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="typingProgressTrack"><div id="typingProgressFill" class="typing-progress-fill"></div></div>
     <label class="sr-only" for="typingInput">Recopie le texte affiché au-dessus</label>
     <textarea id="typingInput" aria-describedby="typingProgress" placeholder="Clique ici et commence à écrire..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div class="stats">
@@ -533,7 +540,7 @@ function recordMistake(key){
   renderSmartTraining();
 }
 
-function buildKeyboard(){
+function buildKeyboard(targetId="keyboard"){
   const rows=["azertyuiop","qsdfghjklm","wxcvbn"];
   const keyMarkup=(k)=>{
     const key=k.toLocaleLowerCase("fr");
@@ -541,7 +548,7 @@ function buildKeyboard(){
     const fingerName=fingerNames[finger]||"doigt selon la touche";
     return `<div class="key ${finger}" data-key="${key}" role="img" aria-label="Touche ${key.toLocaleUpperCase("fr")}, ${fingerName}">${key.toLocaleUpperCase("fr")}</div>`;
   };
-  $("keyboard").innerHTML=rows.map(row=>`<div class="key-row">${[...row].map(keyMarkup).join("")}</div>`).join("")+ 
+  $(targetId).innerHTML=rows.map(row=>`<div class="key-row">${[...row].map(keyMarkup).join("")}</div>`).join("")+ 
     `<div class="key-row"><div class="key space" data-key=" " role="img" aria-label="Barre espace, utilise un pouce">ESPACE</div></div>`;
 }
 function startLearning(level, exerciseIndex=0){
@@ -594,7 +601,7 @@ function renderLearningTarget(typed){
     else if(i===typed.length) span.className="next-char";
     target.appendChild(span);
   });
-  document.querySelectorAll(".key").forEach(k=>{
+  $("keyboard").querySelectorAll(".key").forEach(k=>{
     k.classList.remove("active");
     k.removeAttribute("aria-current");
   });
@@ -603,9 +610,9 @@ function renderLearningTarget(typed){
   if(next!==undefined){
     // Les accents pointent vers la touche de base correspondante sur le clavier visuel.
     const baseKey=String(next).toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-    let key=[...document.querySelectorAll(".key")].find(k=>k.dataset.key===baseKey);
+    let key=[...$("keyboard").querySelectorAll(".key")].find(k=>k.dataset.key===baseKey);
     if(!key && ["?","!",".",",","'",";",":","/","%","à","è","é","ç"].includes(next)){
-      key=[...document.querySelectorAll(".key")].find(k=>k.dataset.key==="m");
+      key=[...$("keyboard").querySelectorAll(".key")].find(k=>k.dataset.key==="m");
     }
     if(key){key.classList.add("active");key.setAttribute("aria-current","true");}
   }
@@ -798,7 +805,14 @@ function renderTypingProgress(){
   target.replaceChildren(fragment);
   const correct=Array.from(typed).reduce((n,ch,i)=>n+(i<expectedText.length&&ch===expectedText[i]?1:0),0);
   const mistakes=Array.from(typed).reduce((n,ch,i)=>n+(i>=expectedText.length||ch!==expectedText[i]?1:0),0);
-  $("typingProgress").textContent=`Progression : ${Math.min(typed.length,expectedText.length)} / ${expectedText.length} caractères • ${correct} correct(s) • ${mistakes} erreur(s)`;
+  const completed=Math.min(typed.length,expectedText.length);
+  const percent=expectedText.length?Math.min(100,Math.round(completed/expectedText.length*100)):0;
+  $("typingProgress").textContent=`Progression : ${percent} % (${completed}/${expectedText.length}) • ${correct} correct(s) • ${mistakes} erreur(s)`;
+  const fill=$("typingProgressFill");
+  const track=$("typingProgressTrack");
+  if(fill)fill.style.width=percent+"%";
+  if(track)track.setAttribute("aria-valuenow",String(percent));
+
 }
 
 function showNextTestPhrase(){
@@ -936,8 +950,15 @@ $("typingInput").addEventListener("input",(event)=>{
   }
   lastInputValue=currentValue;
   renderTypingProgress();
-  if(currentValue===expectedText){
-    completedCharacters+=expectedText.length;
+  // Dans le test d'une minute, une faute ne bloque jamais la progression :
+  // dès que le nombre de caractères saisis atteint la longueur de la phrase,
+  // on passe à la phrase suivante, même si certains caractères sont faux.
+  if(currentValue.length>=expectedText.length){
+    let correctInPhrase=0;
+    for(let i=0;i<expectedText.length;i++){
+      if(currentValue[i]===expectedText[i]) correctInPhrase++;
+    }
+    completedCharacters+=correctInPhrase;
     showNextTestPhrase();
   }
   updateLiveTest();
